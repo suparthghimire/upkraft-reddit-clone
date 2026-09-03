@@ -17,6 +17,7 @@ function Refs() {
         <Input placeholder="Enter your name" id="Name" ref={inputRef} />
         <Button onClick={focusInput}>Focus input</Button>
       </div>
+      <div>Hi</div>
       {/* <input ref={inputRef} id="Name" placeholder="Enter your name" /> */}
     </div>
   );

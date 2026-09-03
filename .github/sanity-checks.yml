@@ -1,0 +1,98 @@
+name: Sanity Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  paths-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      client-spa: ${{ steps.filter.outputs.client-spa }}
+      client-tw-shadcn: ${{ steps.filter.outputs.client-tw-shadcn }}
+      server: ${{ steps.filter.outputs.server }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            client-spa:
+              - 'client/spa/**'
+            client-tw-shadcn:
+              - 'client/tw-shadcn/**'
+            server:
+              - 'server/**'
+
+  sanity-check-client-spa:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.client-spa == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client/spa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "client/spa/pnpm-lock.yaml"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: PR check
+        run: pnpm run pr:check
+
+  sanity-check-client-tw-shadcn:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.client-tw-shadcn == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client/tw-shadcn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "client/tw-shadcn/pnpm-lock.yaml"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: PR check
+        run: pnpm run pr:check
+
+  sanity-check-server:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.server == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "server/pnpm-lock.yaml"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: PR check
+        run: pnpm run pr:check
