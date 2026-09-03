@@ -11,7 +11,7 @@ const typographyVariants = cva("text-foreground", {
       h2: "text-3xl font-semibold leading-snug",
       h3: "text-2xl font-semibold leading-snug",
       h4: "text-xl font-medium leading-snug",
-      h4Bold: "text-xl font-[700] text-[32px] leading-10",
+      h4Bold: "text-xl font-bold leading-snug",
       h5: "text-lg font-medium leading-snug",
       h6: "text-base font-medium leading-snug",
       // h1: "text-4xl font-bold leading-tight",
