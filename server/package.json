@@ -26,6 +26,8 @@
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@types/express": "^5.0.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
     "eslint": "^10.9.1",
     "prettier": "^3.9.6",
     "tsx": "^4.23.12",
@@ -34,6 +36,8 @@
   },
   "dependencies": {
     "express": "^5.2.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "zod": "^4.4.3"
   }
 }

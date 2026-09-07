@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import StepsProvider from "./_providers/step-provider";
 
 function FormInner() {
+  console.log("Hello!");
   const { isDarkMode } = useThemeContext();
   return (
     <main
