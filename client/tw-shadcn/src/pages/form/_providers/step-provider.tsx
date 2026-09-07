@@ -15,7 +15,7 @@ type StepsContextType = {
 const StepsContext = createContext<StepsContextType>({} as StepsContextType);
 
 function StepsProvider(props: PropsWithChildren) {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
 
   const handleNext = () => {
     setStep((prev) => prev + 1);

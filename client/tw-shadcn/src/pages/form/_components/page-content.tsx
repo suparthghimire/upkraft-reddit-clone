@@ -19,8 +19,8 @@ function FormPageContent() {
   });
 
   return (
-    <Card className="max-w-173.75 w-full mx-auto rounded-[12px] p-16 pb-6 h-full  overflow-auto">
-      <CardHeader className="p-0 flex flex-col gap-20 w-full">
+    <Card className="w-full max-w-95 mx-auto rounded-[8px] p-8 pb-4 h-full overflow-auto">
+      <CardHeader className="p-0 flex flex-col gap-10 w-full">
         <Stepper currStep={step} />
         <Typography variant="h4Bold">{steps[step].title}</Typography>
       </CardHeader>
