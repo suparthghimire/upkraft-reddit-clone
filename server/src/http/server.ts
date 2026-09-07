@@ -11,8 +11,8 @@ export class CustomServer {
   }
 
   startServer() {
-    this.app.listen(3000, () => {
-      console.log(`Server is running on port ${3000}`);
+    this.app.listen(5005, () => {
+      console.log(`Server is running on port ${5005}`);
     });
     return this;
   }
