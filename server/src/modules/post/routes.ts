@@ -1,4 +1,4 @@
-import { Router, type NextFunction, type Request, type Response } from 'express';
+import { Router } from 'express';
 import {
   postCreateHandler,
   postDeleteHandler,
@@ -9,7 +9,6 @@ import {
 import { postCreateSchema } from './schemas/create.schema.js';
 import { validate } from '../../middleware/validation.middleware.js';
 import { postUpdateSchema } from './schemas/update.schema.js';
-import { CustomError } from '../../http/error/customError.js';
 
 export const postRouter = Router()
   .get('/', postIndexHandler)
