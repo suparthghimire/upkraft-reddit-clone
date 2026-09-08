@@ -2,6 +2,11 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { POSTS } from "../data";
 
+import {Input} from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {Label} from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
 function CreateNewPost() {
   async function addNewPost(formData: FormData) {
     "use server";
@@ -21,25 +26,27 @@ function CreateNewPost() {
           Go Back
         </Link>
         <h1 className="text-xl">Create new post</h1>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="title">Enter your title</label>
-          <input
+        <div className ="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input
             id="title"
             name="title"
-            className="bg-foreground text-background p-2 rounded-lg outline-none"
+            placeholder="Enter your title"
+            required
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="body">Enter your body</label>
-          <textarea
-            id="body"
-            name="description"
-            className="bg-foreground text-background p-2 rounded-lg outline-none"
-          />
-        </div>
-        <button className="px-4 py-2 cursor-pointer bg-emerald-500 text-emerald-950 rounded-lg w-max">
+        <div className="space-y-2">
+  <Label htmlFor="description">Description</Label>
+  <Textarea
+    id="description"
+    name="description"
+    placeholder="Write your post..."
+    required
+  />
+</div>
+        <Button type="submit">
           Submit
-        </button>
+        </Button>
       </form>
     </>
   );

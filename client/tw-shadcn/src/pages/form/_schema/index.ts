@@ -43,6 +43,7 @@ export const formSchema = z
       invalidErrMsg: "Destination country is invalid",
       missingErrMsg: "Destination country is required",
     }),
+    
     departureDate: z.date("Departure date should be a valid date"),
     returnDate: z.date("Return date should be a valid date"),
     numberOfTravelers: z
