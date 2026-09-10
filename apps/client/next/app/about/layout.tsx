@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from 'react';
 
 function AboutPageLayout(props: PropsWithChildren) {
   return (

@@ -1,5 +1,5 @@
-import "../../../styles/layout/nav.css";
-import Button from "../../core/button";
+import '../../../styles/layout/nav.css';
+import Button from '../../core/button';
 
 export default function Nav() {
   return (

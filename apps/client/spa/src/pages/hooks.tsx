@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import Button from "../components/core/button";
+import { useEffect, useState } from 'react';
+import Button from '../components/core/button';
 
 function HooksInReact() {
   const [count, setCount] = useState<number>(0);
@@ -14,13 +14,13 @@ function HooksInReact() {
   useEffect(
     () => {
       // This effect will run only first render
-      console.log("HooksInReact mounted");
+      console.log('HooksInReact mounted');
 
       // To run someting on unMount, we have to retrun another fn from useEffect
       return () => {
         // This fn is called a cleanup fn
         // And this will run everytime our component is unmounted
-        console.log("HooksInReact unmounted");
+        console.log('HooksInReact unmounted');
       };
     },
     // Dependency array

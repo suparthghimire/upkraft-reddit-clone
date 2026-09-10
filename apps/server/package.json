@@ -8,20 +8,16 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
-    "format:check": "prettier --check src/",
-    "lint": "eslint src/",
-    "pr:check": "pnpm run format:check && pnpm run lint && pnpm run type-check && pnpm run build"
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:check": "eslint src/",
+    "lint:write": "eslint src/ --fix",
+    "lint": "pnpm run lint:check",
+    "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build"
   },
   "keywords": [],
   "author": "Suparth Narayan Ghimire",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.21.0",
-      "onFail": "download"
-    }
-  },
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -35,6 +31,7 @@
     "typescript-eslint": "^8.45.0"
   },
   "dependencies": {
+    "@reddit-clone/shared": "workspace:*",
     "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

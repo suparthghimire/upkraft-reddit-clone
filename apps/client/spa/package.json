@@ -4,15 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173",
     "build": "tsc -b && vite build",
+    "start": "vite preview --host 127.0.0.1 --port 4173",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
     "type-check": "tsc -b --noEmit",
-    "lint": "oxlint",
-    "format:check": "oxlint --format json",
-    "pr:check": "pnpm run format:check && pnpm run lint && pnpm run type-check && pnpm run build",
-    "preview": "vite preview"
+    "lint:check": "oxlint",
+    "lint:write": "oxlint --fix",
+    "lint": "pnpm run lint:check",
+    "preview": "vite preview",
+    "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build"
   },
   "dependencies": {
+    "@reddit-clone/shared": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -26,6 +31,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "babel-plugin-react-compiler": "^1.0.0",
     "oxlint": "^1.75.0",
+    "prettier": "^3.9.6",
     "typescript": "~6.0.2",
     "vite": "^8.2.0"
   }

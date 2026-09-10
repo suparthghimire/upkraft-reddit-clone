@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from "react";
-import { createPortal } from "react-dom";
+import type { PropsWithChildren } from 'react';
+import { createPortal } from 'react-dom';
 
 type Props = PropsWithChildren<{
   open: boolean;
@@ -9,15 +9,15 @@ function Dialog(props: Props) {
   return createPortal(
     <div
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: 0,
         left: 0,
-        background: "rgba(0,0,0,0.5)",
-        width: "100%",
-        display: props.open ? "flex" : "none",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
+        background: 'rgba(0,0,0,0.5)',
+        width: '100%',
+        display: props.open ? 'flex' : 'none',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
       }}
       onClick={() => {
         props.onOpenChange(false);
@@ -26,9 +26,9 @@ function Dialog(props: Props) {
       <div
         style={{
           padding: 10,
-          background: "white",
+          background: 'white',
           borderRadius: 6,
-          position: "relative",
+          position: 'relative',
         }}
         onClick={(e) => {
           e.stopPropagation();
@@ -36,12 +36,12 @@ function Dialog(props: Props) {
       >
         <button
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 10,
             right: 10,
-            background: "transparent",
+            background: 'transparent',
             padding: 0,
-            border: "none",
+            border: 'none',
           }}
           onClick={() => {
             props.onOpenChange(false);

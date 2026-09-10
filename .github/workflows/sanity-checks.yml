@@ -17,7 +17,9 @@ jobs:
     outputs:
       client-spa: ${{ steps.filter.outputs.client-spa }}
       client-tw-shadcn: ${{ steps.filter.outputs.client-tw-shadcn }}
+      client-next: ${{ steps.filter.outputs.client-next }}
       server: ${{ steps.filter.outputs.server }}
+      shared: ${{ steps.filter.outputs.shared }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v4
@@ -25,29 +27,33 @@ jobs:
         with:
           filters: |
             client-spa:
-              - 'client/spa/**'
+              - 'apps/client/spa/**'
             client-tw-shadcn:
-              - 'client/tw-shadcn/**'
+              - 'apps/client/tw-shadcn/**'
+            client-next:
+              - 'apps/client/next/**'
             server:
-              - 'server/**'
+              - 'apps/server/**'
+            shared:
+              - 'packages/shared/**'
 
   sanity-check-client-spa:
     needs: paths-filter
-    if: needs.paths-filter.outputs.client-spa == 'true'
+    if: needs.paths-filter.outputs.client-spa == 'true' || needs.paths-filter.outputs.shared == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: client/spa
+        working-directory: apps/client/spa
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
-          version: latest
+          version: 11.21.0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: "client/spa/pnpm-lock.yaml"
+          cache-dependency-path: "pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: PR check
@@ -55,21 +61,65 @@ jobs:
 
   sanity-check-client-tw-shadcn:
     needs: paths-filter
-    if: needs.paths-filter.outputs.client-tw-shadcn == 'true'
+    if: needs.paths-filter.outputs.client-tw-shadcn == 'true' || needs.paths-filter.outputs.shared == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: client/tw-shadcn
+        working-directory: apps/client/tw-shadcn
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
-          version: latest
+          version: 11.21.0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: "client/tw-shadcn/pnpm-lock.yaml"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: PR check
+        run: pnpm run pr:check
+
+  sanity-check-client-next:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.client-next == 'true' || needs.paths-filter.outputs.shared == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/client/next
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 11.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: PR check
+        run: pnpm run pr:check
+
+  sanity-check-shared:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.shared == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/shared
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 11.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: PR check
@@ -77,21 +127,21 @@ jobs:
 
   sanity-check-server:
     needs: paths-filter
-    if: needs.paths-filter.outputs.server == 'true'
+    if: needs.paths-filter.outputs.server == 'true' || needs.paths-filter.outputs.shared == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: server
+        working-directory: apps/server
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
-          version: latest
+          version: 11.21.0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "pnpm"
-          cache-dependency-path: "server/pnpm-lock.yaml"
+          cache-dependency-path: "pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: PR check

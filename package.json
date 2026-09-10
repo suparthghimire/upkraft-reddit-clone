@@ -1,0 +1,22 @@
+{
+  "name": "Reddit Cline",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "start": "turbo run start --filter=server --filter=spa --filter=tw-shadcn --filter=web-app",
+    "format:check": "turbo run format:check",
+    "format:write": "turbo run format:write",
+    "lint:check": "turbo run lint:check",
+    "lint:write": "turbo run lint:write",
+    "lint": "pnpm run lint:check",
+    "type-check": "turbo run type-check",
+    "pr:check": "turbo run format:check lint:check type-check build"
+  },
+  "packageManager": "pnpm@11.21.0",
+  "dependencies": {
+    "turbo": "^2.10.12"
+  }
+}

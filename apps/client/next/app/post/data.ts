@@ -1,5 +1,3 @@
-export const POSTS: {
-  id: number;
-  title: string;
-  description: string;
-}[] = [];
+import type { Post } from '@reddit-clone/shared';
+
+export const POSTS: Post[] = [];

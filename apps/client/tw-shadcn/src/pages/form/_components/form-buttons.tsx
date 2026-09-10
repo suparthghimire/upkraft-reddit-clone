@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function FormButtons(props: {
   backProps: {
@@ -14,11 +14,7 @@ function FormButtons(props: {
   const { backProps, nextProps } = props;
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        onClick={backProps.onClick}
-        disabled={backProps.disabled}
-      >
+      <Button variant="ghost" onClick={backProps.onClick} disabled={backProps.disabled}>
         <ChevronLeft />
         Back
       </Button>

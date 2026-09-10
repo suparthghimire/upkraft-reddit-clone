@@ -1,8 +1,8 @@
-import { useState } from "react";
-import Button from "../components/core/button";
-import "../styles/tic-tac-toe.css";
+import { useState } from 'react';
+import Button from '../components/core/button';
+import '../styles/tic-tac-toe.css';
 
-type BoardCell = "X" | "O" | null;
+type BoardCell = 'X' | 'O' | null;
 type GameOverState = {
   isGameOver: boolean;
   winner?: BoardCell;
@@ -66,7 +66,7 @@ const winningCombinations = [
 
 function TicTacToe() {
   const [board, setBoard] = useState(generateEmptyBoard());
-  const [turn, setTurn] = useState<Required<BoardCell>>("X");
+  const [turn, setTurn] = useState<Required<BoardCell>>('X');
   const [gameOverState, setGameOverState] = useState<GameOverState>({
     isGameOver: false,
     winner: null,
@@ -74,7 +74,7 @@ function TicTacToe() {
   });
 
   function swapTurn() {
-    setTurn(turn === "X" ? "O" : "X");
+    setTurn(turn === 'X' ? 'O' : 'X');
   }
 
   function determineGameOver(board: BoardCell[][]) {
@@ -130,9 +130,7 @@ function TicTacToe() {
     const cell = newBoard[args.rowIndex][args.cellIndex];
 
     if (cell !== null) {
-      alert(
-        `Cell is already filled with ${cell}. Please select an empty cell.`,
-      );
+      alert(`Cell is already filled with ${cell}. Please select an empty cell.`);
       return;
     }
 
@@ -148,7 +146,7 @@ function TicTacToe() {
 
   function resetGame() {
     setBoard(generateEmptyBoard());
-    setTurn("X");
+    setTurn('X');
     setGameOverState({
       isGameOver: false,
       winner: null,

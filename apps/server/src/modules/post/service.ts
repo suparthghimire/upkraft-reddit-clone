@@ -1,9 +1,7 @@
-import type { PostCreateInput } from './schemas/create.schema.js';
+import type { Post } from '@reddit-clone/shared';
 
-export let posts: (PostCreateInput & {
-  id: string;
-})[] = [];
+export let posts: Post[] = [];
 
-export function replacePosts(newPosts: (PostCreateInput & { id: string })[]) {
+export function replacePosts(newPosts: Post[]) {
   posts = newPosts;
 }

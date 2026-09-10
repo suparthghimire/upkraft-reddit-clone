@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 function HomePageLoading() {
   return <div>Loading...</div>;

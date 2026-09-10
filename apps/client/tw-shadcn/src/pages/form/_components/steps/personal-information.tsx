@@ -1,31 +1,20 @@
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Controller, type UseFormReturn } from "react-hook-form";
-import type { FormSchema } from "../../_schema";
-import { Input } from "@/components/ui/input";
-import FormButtons from "../form-buttons";
-import { useSteps } from "../../_providers/step-provider";
-import { PhoneInput } from "@/components/reui/phone-input";
-import { DatePicker } from "@/components/ui/date-picker";
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Controller, type UseFormReturn } from 'react-hook-form';
+import type { FormSchema } from '../../_schema';
+import { Input } from '@/components/ui/input';
+import FormButtons from '../form-buttons';
+import { useSteps } from '../../_providers/step-provider';
+import { PhoneInput } from '@/components/reui/phone-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
-const fieldsInThisStep: (keyof FormSchema)[] = [
-  "name",
-  "email",
-  "phone",
-  "dob",
-  "gender",
-];
+const fieldsInThisStep: (keyof FormSchema)[] = ['name', 'email', 'phone', 'dob', 'gender'];
 
 function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
   const { form } = props;
@@ -57,9 +46,7 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
                   autoComplete="off"
                 />
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
           }}
@@ -82,9 +69,7 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
                   autoComplete="off"
                 />
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
           }}
@@ -107,9 +92,7 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
                   autoComplete="off"
                 />
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
           }}
@@ -130,9 +113,7 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
                   aria-invalid={fieldState.invalid}
                 />
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
           }}
@@ -145,18 +126,14 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
           name="gender"
           render={({ field, fieldState }) => {
             const items = [
-              { label: "Male", value: "male" },
-              { label: "Female", value: "female" },
-              { label: "Other", value: "other" },
+              { label: 'Male', value: 'male' },
+              { label: 'Female', value: 'female' },
+              { label: 'Other', value: 'other' },
             ] as const;
             return (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="gender">Gender</FieldLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  items={items}
-                >
+                <Select value={field.value} onValueChange={field.onChange} items={items}>
                   <SelectTrigger aria-invalid={fieldState.invalid}>
                     <SelectValue />
                   </SelectTrigger>
@@ -169,9 +146,7 @@ function PersonalInformation(props: { form: UseFormReturn<FormSchema> }) {
                   </SelectContent>
                 </Select>
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             );
           }}

@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import Button from "../components/core/button";
+import { useRef, useState } from 'react';
+import Button from '../components/core/button';
 
 function mockingAPICall(userName: string, delay: number) {
   return new Promise<{ userName: string }>((resolve) => {
@@ -12,9 +12,7 @@ function mockingAPICall(userName: string, delay: number) {
 }
 
 function Mutations() {
-  const [fetchedData, setFetchedData] = useState<{ userName: string } | null>(
-    null,
-  );
+  const [fetchedData, setFetchedData] = useState<{ userName: string } | null>(null);
 
   const selectedUser = useRef<string>(null);
 
@@ -36,34 +34,32 @@ function Mutations() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div>
-        Fetched data will be displayed here: {JSON.stringify(fetchedData)}
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div>Fetched data will be displayed here: {JSON.stringify(fetchedData)}</div>
       <Button
         onClick={() => {
-          handleFetchData("Jhon", 2000);
+          handleFetchData('Jhon', 2000);
         }}
       >
         Fetch data Jhon
       </Button>
       <Button
         onClick={() => {
-          handleFetchData("Mary", 500);
+          handleFetchData('Mary', 500);
         }}
       >
         Fetch data Mary
       </Button>
       <Button
         onClick={() => {
-          handleFetchData("Ram", 5000);
+          handleFetchData('Ram', 5000);
         }}
       >
         Fetch data Ram
       </Button>
       <Button
         onClick={() => {
-          handleFetchData("Sita", 3000);
+          handleFetchData('Sita', 3000);
         }}
       >
         Fetch data Sita

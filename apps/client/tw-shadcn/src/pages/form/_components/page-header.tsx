@@ -1,5 +1,5 @@
-import Typography from "@/components/ui/typogrpahy";
-import ThemeToggle from "./theme-toggle";
+import Typography from '@/components/ui/typogrpahy';
+import ThemeToggle from './theme-toggle';
 
 function PageSidebar() {
   return (

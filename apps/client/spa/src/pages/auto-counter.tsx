@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 // Increment the counter automatically every 1 sec
 // Hint: Use setInterval

@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
-import Button from "../components/core/button";
-import Dialog from "../components/core/dialog";
-import Input from "../components/core/input";
+import { useRef, useState } from 'react';
+import Button from '../components/core/button';
+import Dialog from '../components/core/dialog';
+import Input from '../components/core/input';
 
 function DialogPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -16,7 +16,7 @@ function DialogPage() {
     timeoutRef.current = setTimeout(() => {
       if (openValue) {
         if (inputRef.current) {
-          console.log("FOCUS PLEASE");
+          console.log('FOCUS PLEASE');
           inputRef.current.focus();
         }
       }

@@ -1,19 +1,12 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-export function DatePicker(props: {
-  date: Date;
-  setDate: (value: Date) => void;
-}) {
+export function DatePicker(props: { date: Date; setDate: (value: Date) => void }) {
   const [open, setOpen] = React.useState(false);
   const { date, setDate } = props;
 
@@ -22,12 +15,8 @@ export function DatePicker(props: {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={
-            <Button
-              variant="outline"
-              id="date"
-              className="justify-start font-normal w-full"
-            >
-              {date ? date.toLocaleDateString() : "Select date"}
+            <Button variant="outline" id="date" className="justify-start font-normal w-full">
+              {date ? date.toLocaleDateString() : 'Select date'}
             </Button>
           }
         />

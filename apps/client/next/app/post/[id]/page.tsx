@@ -1,6 +1,6 @@
-import React from "react";
-import { POSTS } from "../data";
-import Link from "next/link";
+import React from 'react';
+import { POSTS } from '../data';
+import Link from 'next/link';
 
 type Props = {
   params: Promise<{
@@ -11,7 +11,7 @@ type Props = {
 async function SinglePostPage(props: Props) {
   const params = await props.params;
 
-  const post = POSTS.find((post) => post.id === Number(params.id));
+  const post = POSTS.find((post) => post.id === params.id);
 
   if (!post) return <>Post not found</>;
 
@@ -30,7 +30,7 @@ async function SinglePostPage(props: Props) {
         </Link>
       </div>
 
-      <p className="text-xs">{post.description}</p>
+      <p className="text-xs">{post.content}</p>
     </div>
   );
 }

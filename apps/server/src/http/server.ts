@@ -39,7 +39,7 @@ export class CustomServer {
   }
 
   registerRequestErrorHandler() {
-    this.app.use((err: any, req: Request, res: Response) => {
+    this.app.use((err: unknown, req: Request, res: Response) => {
       const handledError = new ErrorHandler(err);
       const responsePayload = handledError.handle();
       return sendResponse({

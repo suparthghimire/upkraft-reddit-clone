@@ -1,5 +1,5 @@
-import "../../../styles/layout/sidebar.css";
-import Nav from "./nav";
+import '../../../styles/layout/sidebar.css';
+import Nav from './nav';
 
 function Sidebar() {
   return (

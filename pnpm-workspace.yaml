@@ -1,0 +1,7 @@
+packages:
+  - "apps/server"
+  - "apps/client/*"
+  - "packages/*"
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true

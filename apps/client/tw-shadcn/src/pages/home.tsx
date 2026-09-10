@@ -1,4 +1,4 @@
-import RootLayout from "@/components/layout/root-layout";
+import RootLayout from '@/components/layout/root-layout';
 
 function HomePage() {
   return (

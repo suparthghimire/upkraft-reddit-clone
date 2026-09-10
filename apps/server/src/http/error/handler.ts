@@ -3,7 +3,7 @@ import { CustomError } from './customError.js';
 import type { ResponseFormat } from '../response/index.js';
 
 export class ErrorHandler {
-  constructor(private readonly error: any) {}
+  constructor(private readonly error: unknown) {}
 
   // Based on instance of err, return the response payload
   handle(): ResponseFormat {

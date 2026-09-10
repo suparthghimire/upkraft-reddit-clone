@@ -1,5 +1,5 @@
-import { Switch } from "@/components/ui/switch";
-import { useThemeContext } from "../_providers/theme.provider";
+import { Switch } from '@/components/ui/switch';
+import { useThemeContext } from '../_providers/theme.provider';
 
 function ThemeToggle() {
   const { isDarkMode, toggleDarkMode } = useThemeContext();

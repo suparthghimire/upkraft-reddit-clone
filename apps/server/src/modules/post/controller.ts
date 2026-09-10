@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { postSchema } from '@reddit-clone/shared';
 import { posts, replacePosts } from './service.js';
 import { type PostCreateInput } from './schemas/create.schema.js';
 import type { PostUpdateInput } from './schemas/update.schema.js';
@@ -59,9 +60,7 @@ export function postUpdateHandler(req: Request, res: Response) {
 
   const post = posts[postIndex]!;
 
-  const updatedPost = { ...post, ...validatedBody } as PostCreateInput & {
-    id: string;
-  };
+  const updatedPost = postSchema.parse({ ...post, ...validatedBody });
 
   posts[postIndex] = updatedPost;
 

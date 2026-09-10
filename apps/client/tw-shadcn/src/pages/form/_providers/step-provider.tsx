@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { createContext, useContext, useState, type PropsWithChildren } from 'react';
 
 type StepsContextType = {
   step: number;
@@ -49,7 +44,7 @@ export const useSteps = () => {
   const context = useContext(StepsContext);
 
   if (!context) {
-    throw new Error("useSteps must be used within a StepsProvider");
+    throw new Error('useSteps must be used within a StepsProvider');
   }
 
   return context;

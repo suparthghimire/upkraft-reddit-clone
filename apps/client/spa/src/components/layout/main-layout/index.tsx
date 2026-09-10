@@ -1,8 +1,8 @@
-import type React from "react";
-import "../../../styles/layout/main-layout.css";
-import Footer from "./footer";
-import Header from "./header";
-import Sidebar from "./sidebar";
+import type React from 'react';
+import '../../../styles/layout/main-layout.css';
+import Footer from './footer';
+import Header from './header';
+import Sidebar from './sidebar';
 
 function MainLayout(props: { children?: React.ReactNode }) {
   return (

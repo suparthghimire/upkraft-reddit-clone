@@ -1,18 +1,23 @@
-import Link from "next/link";
-import { revalidatePath } from "next/cache";
-import { POSTS } from "../data";
+import Link from 'next/link';
+import { revalidatePath } from 'next/cache';
+import { POSTS } from '../data';
 
 function CreateNewPost() {
   async function addNewPost(formData: FormData) {
-    "use server";
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    'use server';
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
     POSTS.push({
-      id: POSTS.length + 1,
+      id: String(POSTS.length + 1),
       title,
-      description,
+      content,
+      images: [],
+      createdBy: {
+        id: 'local-user',
+        name: 'Local User',
+      },
     });
-    revalidatePath("/post");
+    revalidatePath('/post');
   }
   return (
     <>
@@ -33,7 +38,7 @@ function CreateNewPost() {
           <label htmlFor="body">Enter your body</label>
           <textarea
             id="body"
-            name="description"
+            name="content"
             className="bg-foreground text-background p-2 rounded-lg outline-none"
           />
         </div>

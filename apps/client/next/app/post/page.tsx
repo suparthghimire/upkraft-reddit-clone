@@ -1,10 +1,7 @@
-import Link from "next/link";
-import { POSTS } from "./data";
+import Link from 'next/link';
+import { POSTS } from './data';
 
 function Posts() {
-  async function deletePost(postId: string) {
-    "use server";
-  }
   return (
     <>
       {POSTS.length <= 0 ? (
@@ -23,9 +20,7 @@ function Posts() {
           <div className="flex flex-col gap-1 w-max hover:underline text-background">
             <Link href={`/post/${post.id}`} className="cursor-pointer">
               <h2 className="text-lg text-background">{post.title}</h2>
-              <p className="text-xs text-background line-clamp-2 text-ellipsis">
-                {post.description}
-              </p>
+              <p className="text-xs text-background line-clamp-2 text-ellipsis">{post.content}</p>
             </Link>
           </div>
           <button className="p-2 rounded-lg cursor-pointer hover:bg-red-100 text-xs bg-red-200 border border-red-500 text-red-500 ">
@@ -40,7 +35,7 @@ function Posts() {
 function EmptyContent() {
   return (
     <p>
-      Please add posts from{" "}
+      Please add posts from{' '}
       <Link className="text-blue-500 underline" href="/post/create">
         here
       </Link>

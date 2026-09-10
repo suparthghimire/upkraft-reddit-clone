@@ -3,13 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "next dev --webpack --port 3000",
+    "build": "next build --webpack",
+    "start": "next start --hostname 127.0.0.1 --port 3000",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:check": "eslint .",
+    "lint:write": "eslint . --fix",
+    "lint": "pnpm run lint:check",
+    "type-check": "tsc --noEmit",
+    "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@reddit-clone/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.6",
     "lucide-react": "^1.41.0",
@@ -28,8 +35,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "packageManager": "pnpm@11.21.0"
+  }
 }

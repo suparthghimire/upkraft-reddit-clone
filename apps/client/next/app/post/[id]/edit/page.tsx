@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { POSTS } from "../../data";
-import { revalidatePath } from "next/cache";
+import Link from 'next/link';
+import { POSTS } from '../../data';
+import { revalidatePath } from 'next/cache';
 
 type Props = {
   params: Promise<{
@@ -11,21 +11,21 @@ type Props = {
 async function EditPostPage(props: Props) {
   const params = await props.params;
 
-  const post = POSTS.find((post) => post.id === Number(params.id));
+  const post = POSTS.find((post) => post.id === params.id);
 
   async function updatePost(formData: FormData) {
-    "use server";
-    const title = formData.get("title");
-    const description = formData.get("description");
+    'use server';
+    const title = formData.get('title');
+    const content = formData.get('content');
 
-    const postIndex = POSTS.findIndex((p) => p.id === Number(params.id));
+    const postIndex = POSTS.findIndex((p) => p.id === params.id);
 
     if (postIndex === -1) return;
 
     POSTS[postIndex].title = title as string;
-    POSTS[postIndex].description = description as string;
+    POSTS[postIndex].content = content as string;
 
-    revalidatePath("/posts/" + params.id + "/edit");
+    revalidatePath('/posts/' + params.id + '/edit');
   }
 
   if (!post) return <>Post not found</>;
@@ -49,8 +49,8 @@ async function EditPostPage(props: Props) {
         <label htmlFor="body">Enter your body</label>
         <textarea
           id="body"
-          name="description"
-          defaultValue={post.description}
+          name="content"
+          defaultValue={post.content}
           className="bg-foreground text-background p-2 rounded-lg outline-none"
         />
       </div>
