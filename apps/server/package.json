@@ -1,5 +1,5 @@
 {
-  "name": "redit-clone-server",
+  "name": "server",
   "version": "1.0.0",
   "description": "Server for redit clone",
   "main": "src/index.ts",
