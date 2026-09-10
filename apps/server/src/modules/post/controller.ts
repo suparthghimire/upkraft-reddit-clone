@@ -1,8 +1,6 @@
 import type { Request, Response } from 'express';
-import { postSchema } from '@reddit-clone/shared';
+import { postSchema, type PostCreateInput, type PostUpdateInput } from '@reddit-clone/shared';
 import { posts, replacePosts } from './service.js';
-import { type PostCreateInput } from './schemas/create.schema.js';
-import type { PostUpdateInput } from './schemas/update.schema.js';
 import { CustomError } from '../../http/error/customError.js';
 import { sendResponse } from '../../http/response/index.js';
 

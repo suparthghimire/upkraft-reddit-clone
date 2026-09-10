@@ -6,9 +6,8 @@ import {
   postUpdateHandler,
   postRetrieveHandler,
 } from './controller.js';
-import { postCreateSchema } from './schemas/create.schema.js';
 import { validate } from '../../middleware/validation.middleware.js';
-import { postUpdateSchema } from './schemas/update.schema.js';
+import { postCreateSchema, postUpdateSchema } from '@reddit-clone/shared';
 
 export const postRouter = Router()
   .get('/', postIndexHandler)

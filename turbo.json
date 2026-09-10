@@ -9,7 +9,14 @@
     "dev": {
       "dependsOn": ["^build"],
       "persistent": true,
-      "cache": false
+      "cache": false,
+      "with": ["@reddit-clone/shared#dev"]
+    },
+    "@reddit-clone/shared#dev": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false,
+      "with": []
     },
     "start": {
       "dependsOn": ["build"],
