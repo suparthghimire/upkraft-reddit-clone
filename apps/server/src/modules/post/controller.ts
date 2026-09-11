@@ -1,10 +1,13 @@
 import type { Request, Response } from 'express';
-import { postSchema, type PostCreateInput, type PostUpdateInput } from '@reddit-clone/shared';
-import { posts, replacePosts } from './service.js';
-import { CustomError } from '../../http/error/customError.js';
 import { sendResponse } from '../../http/response/index.js';
+import { createPost, getAllPosts, getPostById, updatePost, deletePost } from './service.js';
+import z from 'zod';
+import { CustomError } from '../../http/error/customError.js';
+import type { PostCreateInput, PostUpdateInput } from '@reddit-clone/shared';
 
-export function postIndexHandler(req: Request, res: Response) {
+export async function postIndexHandler(req: Request, res: Response) {
+  const posts = await getAllPosts();
+
   return sendResponse({
     res,
     data: posts,
@@ -13,11 +16,12 @@ export function postIndexHandler(req: Request, res: Response) {
   });
 }
 
-export function postRetrieveHandler(req: Request, res: Response) {
+export async function postRetrieveHandler(req: Request, res: Response) {
   const id = req.params.id;
 
-  // Find the post
-  const post = posts.find((post) => post.id === id);
+  const numericId = z.number().parse(Number(id));
+
+  const post = await getPostById(numericId);
 
   if (!post) throw new CustomError('Post not found', 404);
 
@@ -29,63 +33,41 @@ export function postRetrieveHandler(req: Request, res: Response) {
   });
 }
 
-export function postCreateHandler(req: Request, res: Response) {
+export async function postCreateHandler(req: Request, res: Response) {
   const validatedBody = req.validatedBody as PostCreateInput;
-  // Generate a random id
-  const randomId = (Math.floor(Math.random() * 1000) + 1).toString();
-  const post = { id: randomId, ...validatedBody };
-  posts.push(post);
+
+  await createPost(validatedBody);
 
   return sendResponse({
     res,
-    data: post,
+    data: null,
     message: 'Post created successfully',
     statusCode: 201,
   });
 }
 
-export function postUpdateHandler(req: Request, res: Response) {
-  const id = req.params.id;
+export async function postUpdateHandler(req: Request, res: Response) {
+  const id = z.number().parse(Number(req.params.id));
   const validatedBody = req.validatedBody as PostUpdateInput;
 
-  // sometcode
-  // Find post that belongs to the id
-  const postIndex = posts.findIndex((post) => post.id === id);
-
-  // TODOL Instead of throwing Error,
-  // See how. can we throw 404 err
-  if (postIndex === -1) throw new CustomError('Post not found', 404);
-
-  const post = posts[postIndex]!;
-
-  const updatedPost = postSchema.parse({ ...post, ...validatedBody });
-
-  posts[postIndex] = updatedPost;
+  await updatePost(id, validatedBody);
 
   return sendResponse({
     res,
-    data: updatedPost,
+    data: null,
     message: 'Post updated successfully',
     statusCode: 201,
   });
 }
 
-export function postDeleteHandler(req: Request, res: Response) {
-  const id = req.params.id;
+export async function postDeleteHandler(req: Request, res: Response) {
+  const id = z.number().parse(Number(req.params.id));
 
-  // Find the post
-  const postIndex = posts.findIndex((post) => post.id === id);
-
-  if (postIndex === -1) throw new CustomError('Post not found', 404);
-
-  // Filter posts whose id is not the given id
-  const newPosts = posts.filter((post) => post.id !== id);
-
-  replacePosts(newPosts);
+  await deletePost(id);
 
   return sendResponse({
     res,
-    data: newPosts,
+    data: null,
     message: 'Post deleted successfully',
     statusCode: 201,
   });

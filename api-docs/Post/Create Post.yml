@@ -14,12 +14,7 @@ http:
     data: |-
       {
         "title": "Some title",
-        "content": "Some Content",
-        "images": [],
-        "createdBy": {
-          "id": "ABC",
-          "name": "Suparth"
-        }
+        "content": "Some Content"
       }
   auth: inherit
 
@@ -28,3 +23,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

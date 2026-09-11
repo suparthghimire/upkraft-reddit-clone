@@ -3,8 +3,8 @@ import {
   postCreateHandler,
   postDeleteHandler,
   postIndexHandler,
-  postUpdateHandler,
   postRetrieveHandler,
+  postUpdateHandler,
 } from './controller.js';
 import { validate } from '../../middleware/validation.middleware.js';
 import { postCreateSchema, postUpdateSchema } from '@reddit-clone/shared';

@@ -1,4 +1,10 @@
-import express, { type Router, type Express, type Request, type Response } from 'express';
+import express, {
+  type Router,
+  type Express,
+  type Request,
+  type Response,
+  type NextFunction,
+} from 'express';
 import { ErrorHandler } from './error/handler.js';
 import { sendResponse } from './response/index.js';
 
@@ -39,7 +45,7 @@ export class CustomServer {
   }
 
   registerRequestErrorHandler() {
-    this.app.use((err: unknown, req: Request, res: Response) => {
+    this.app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
       const handledError = new ErrorHandler(err);
       const responsePayload = handledError.handle();
       return sendResponse({
