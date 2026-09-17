@@ -46,6 +46,8 @@ export async function login(res: Response, body: LoginInput) {
 }
 
 export async function signup(body: SignupInput) {
+  const { confirmPassword, ...userData } = body;
+
   // Find user with same email
   const userWithEmainExists = await dbInstance
     .select()
@@ -56,7 +58,7 @@ export async function signup(body: SignupInput) {
     throw new CustomError('User with this email already exists', 409);
 
   const salt = await bcrypt.genSalt(10);
-  const hasnedPassword = await bcrypt.hash(body.password, salt);
+  const hashedPassword = await bcrypt.hash(body.password, salt);
 
-  return dbInstance.insert(usersTable).values({ ...body, password: hasnedPassword });
+  return dbInstance.insert(usersTable).values({ ...userData, password: hashedPassword });
 }

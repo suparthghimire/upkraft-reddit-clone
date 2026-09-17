@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
-import { login } from '@/lib/api/auth.api';
+import { login, signup} from '@/lib/api/auth.api';
 import { APP_ROUTES } from '@/lib/app-routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -247,6 +247,9 @@ function LoginForm() {
 }
 
 function RegisterForm({ submitLabel }: { submitLabel: string }) {
+  
+  const router = useRouter();
+  
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -257,19 +260,34 @@ function RegisterForm({ submitLabel }: { submitLabel: string }) {
     },
   });
 
-  function onSubmit() {}
+  const {mutateAsync: triggerSignup, isPending} = useMutation({
+    mutationFn: signup,
+    mutationKey: ['signup'],
+  });
+
+  const onSubmit = (data: RegisterInput) => {
+    toast.promise(triggerSignup(data), {
+      loading: 'Creating account...',
+      success: () => {
+        router.push(APP_ROUTES.AUTH.LOGIN);
+        return 'Account created successfully. Please log in.'
+      },
+      error: 'Failed to create account. Please try again.',
+    });
+  };
+
 
   return (
     <AuthFormShell
       formId="register-form"
       submitLabel={submitLabel}
-      onSubmit={form.handleSubmit(() => undefined)}
+      onSubmit={form.handleSubmit(onSubmit)}
+      isPending={isPending}
       preference="I agree to keep conversations respectful and follow the community guidelines."
       preferenceChecked
     >
-      <form
+      <div
         className="rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-sm sm:p-7"
-        noValidate
       >
         <AuthField
           id="register-name"
@@ -311,7 +329,7 @@ function RegisterForm({ submitLabel }: { submitLabel: string }) {
           registration={form.register('confirmPassword')}
           error={form.formState.errors.confirmPassword}
         />
-      </form>
+      </div>
     </AuthFormShell>
   );
 }
@@ -323,6 +341,7 @@ function AuthFormShell({
   preference,
   preferenceChecked = false,
   submitLabel,
+  isPending=false,
 }: {
   children: React.ReactNode;
   formId: string;
@@ -330,6 +349,7 @@ function AuthFormShell({
   preference: string;
   preferenceChecked?: boolean;
   submitLabel: string;
+  isPending?: boolean;
 }) {
   return (
     <form
@@ -347,7 +367,7 @@ function AuthFormShell({
         <p className="text-xs leading-5 text-muted-foreground">{preference}</p>
       </div>
 
-      <Button type="submit" className="mt-6 h-11 w-full rounded-xl text-sm">
+      <Button loading={isPending} type="submit" className="mt-6 h-11 w-full rounded-xl text-sm">
         {submitLabel}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Button>
