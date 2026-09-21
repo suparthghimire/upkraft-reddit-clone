@@ -15,6 +15,8 @@ export function postColumns() {
     created_at: true,
     slug: true,
     updated_at: true,
+    total_upvotes: true,
+    total_downvotes: true,
   } as const;
 }
 
@@ -50,6 +52,7 @@ export function getPostById(postId: number) {
       user: {
         columns: userColumns(),
       },
+      votes: true,
     },
   });
 }
@@ -64,6 +67,7 @@ export function getPostBySlug(slug: string) {
       user: {
         columns: userColumns(),
       },
+      votes: true,
     },
   });
 }
@@ -93,14 +97,22 @@ export async function votePost(args: {
     const [existingVote] = await tx
       .select()
       .from(postUserVotesTable)
-      .where(and(eq(postUserVotesTable.post_id, postId), eq(postUserVotesTable.user_id, userId)))
+      .where(
+        and(
+          eq(postUserVotesTable.post_id, postId),
+          eq(postUserVotesTable.user_id, userId),
+          eq(postUserVotesTable.vote_type, voteType),
+        ),
+      )
       .for('update');
 
     const nextVote = existingVote?.vote_type === voteType ? null : voteType;
     const upvoteDelta =
       (nextVote === 'upvote' ? 1 : 0) - (existingVote?.vote_type === 'upvote' ? 1 : 0);
+
     const downvoteDelta =
       (nextVote === 'downvote' ? 1 : 0) - (existingVote?.vote_type === 'downvote' ? 1 : 0);
+
     const totalUpvotes = Math.max(0, post.total_upvotes + upvoteDelta);
     const totalDownvotes = Math.max(0, post.total_downvotes + downvoteDelta);
 

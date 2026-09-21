@@ -21,7 +21,7 @@ export const postUserVotesTable = pgTable(
   (table) => {
     return [
       index('post_id_idx').on(table.post_id),
-      unique('post_user_vote_unique').on(table.post_id, table.user_id),
+      unique('post_user_vote_type_unique').on(table.post_id, table.user_id, table.vote_type),
     ];
   },
 );

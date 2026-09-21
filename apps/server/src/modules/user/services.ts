@@ -17,6 +17,9 @@ export async function getUserById(userId: number) {
       id: userId,
     },
     columns: userColumns(),
+    with: {
+      votes: true,
+    },
   });
 
   if (!user) throw new CustomError('User not found', 404);

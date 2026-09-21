@@ -17,6 +17,12 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import { APP_ROUTES } from '@/lib/app-routes';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getUserData } from '@/lib/api/user.api';
+import { useGetUserAPI } from '@/hooks/api/useUser';
+import { toast } from '@/components/ui/toast';
+import { CleanedUser } from '@reddit-clone/shared';
+import { voteOnPost } from '@/lib/api/post.api';
 
 type Vote = -1 | 0 | 1;
 
@@ -46,6 +52,8 @@ function PostView({ post }: { post: Post }) {
   const [vote, setVote] = useState<Vote>(0);
   const [isSaved, setIsSaved] = useState(false);
   const [wasCopied, setWasCopied] = useState(false);
+  const { data: currentUser } = useGetUserAPI();
+
   const wasEdited = toDate(post.updated_at).getTime() !== toDate(post.created_at).getTime();
 
   function castVote(nextVote: Exclude<Vote, 0>) {
@@ -56,12 +64,11 @@ function PostView({ post }: { post: Post }) {
     const shareData = { title: post.title, url: window.location.href };
 
     if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-      }
+      toast.promise(navigator.share(shareData), {
+        success: 'Done!',
+        error: 'Failed to share the post.',
+        loading: 'Processing...',
+      });
     }
 
     try {
@@ -120,69 +127,33 @@ function PostView({ post }: { post: Post }) {
           </header>
 
           <div className="px-5 py-8 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
-            <div className="max-w-3xl whitespace-pre-wrap break-words text-[15px] leading-8 text-black/70 sm:text-base">
+            <div className="max-w-3xl whitespace-pre-wrap wrap-break-word text-[15px] leading-8 text-black/70 sm:text-base">
               {post.content}
             </div>
           </div>
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-black/7 bg-[#fbfaf7] px-5 py-4 sm:px-9 lg:px-12">
-            <div
-              className="inline-flex items-center rounded-full bg-[#eeece7] p-0.5"
-              aria-label="Post voting"
-            >
-              <button
-                type="button"
-                onClick={() => castVote(1)}
-                className={`grid size-8 place-items-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40 ${
-                  vote === 1
-                    ? 'bg-[#ff6842] text-white shadow-sm'
-                    : 'text-black/45 hover:bg-white hover:text-[#e44e27]'
-                }`}
-                aria-label="Upvote post"
-                aria-pressed={vote === 1}
-              >
-                <ArrowBigUp className="size-4" aria-hidden="true" />
-              </button>
-              <span
-                className={`min-w-8 text-center text-xs font-bold tabular-nums ${
-                  vote === 0 ? 'text-black/55' : 'text-[#c64220]'
-                }`}
-                aria-label={`${vote} votes`}
-              >
-                {vote}
-              </span>
-              <button
-                type="button"
-                onClick={() => castVote(-1)}
-                className={`grid size-8 place-items-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6558c7]/40 ${
-                  vote === -1
-                    ? 'bg-[#6558c7] text-white shadow-sm'
-                    : 'text-black/45 hover:bg-white hover:text-[#6558c7]'
-                }`}
-                aria-label="Downvote post"
-                aria-pressed={vote === -1}
-              >
-                <ArrowBigDown className="size-4" aria-hidden="true" />
-              </button>
-            </div>
+            {currentUser?.data && <PostVoteActions post={post} currentUser={currentUser.data} />}
 
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setIsSaved((currentValue) => !currentValue)}
-                className={`inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40 ${
-                  isSaved
-                    ? 'bg-[#fff0eb] text-[#c64220]'
-                    : 'text-black/50 hover:bg-black/5 hover:text-black/75'
-                }`}
-                aria-pressed={isSaved}
-              >
-                <Bookmark
-                  className={`size-3.5 ${isSaved ? 'fill-current' : ''}`}
-                  aria-hidden="true"
-                />
-                {isSaved ? 'Saved' : 'Save'}
-              </button>
+            <div className="flex items-center justify-end gap-1.5">
+              {currentUser?.data && (
+                <button
+                  type="button"
+                  onClick={() => setIsSaved((currentValue) => !currentValue)}
+                  className={`inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40 ${
+                    isSaved
+                      ? 'bg-[#fff0eb] text-[#c64220]'
+                      : 'text-black/50 hover:bg-black/5 hover:text-black/75'
+                  }`}
+                  aria-pressed={isSaved}
+                >
+                  <Bookmark
+                    className={`size-3.5 ${isSaved ? 'fill-current' : ''}`}
+                    aria-hidden="true"
+                  />
+                  {isSaved ? 'Saved' : 'Save'}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={sharePost}
@@ -260,6 +231,85 @@ function PostView({ post }: { post: Post }) {
         </aside>
       </div>
     </main>
+  );
+}
+
+function PostVoteActions(props: { currentUser: CleanedUser; post: Post }) {
+  const userVotes = props.post.votes.filter((vote) => vote.user_id === props.currentUser.id);
+
+  const [voteCount, setVoteCount] = useState({
+    upvote: {
+      status: userVotes.some((vote) => vote.vote_type === 'upvote'),
+      count: props.post.total_upvotes,
+    },
+    downvote: {
+      status: userVotes.some((vote) => vote.vote_type === 'downvote'),
+      count: props.post.total_downvotes,
+    },
+  });
+
+  const { mutateAsync: castVote } = useMutation({
+    mutationFn: voteOnPost,
+    mutationKey: ['voteOnPost'],
+  });
+
+  function handleVote(voteType: 'upvote' | 'downvote') {
+    setVoteCount((prev) => {
+      const upvoteChangeValue = prev[voteType].status === true ? -1 : 1;
+      return {
+        ...prev,
+        [voteType]: {
+          status: !prev[voteType].status,
+          count: prev[voteType].count + upvoteChangeValue,
+        },
+      };
+    });
+    void castVote({ postId: props.post.id, voteType: voteType });
+  }
+
+  return (
+    <div
+      className="inline-flex items-center rounded-full bg-[#eeece7] p-0.5"
+      aria-label="Post voting"
+    >
+      <VoteButton
+        onClick={() => handleVote('upvote')}
+        voteType="upvote"
+        count={voteCount.upvote.count}
+      />
+
+      <VoteButton
+        onClick={() => handleVote('downvote')}
+        voteType="downvote"
+        count={voteCount.downvote.count}
+      />
+    </div>
+  );
+}
+
+function VoteButton(
+  props: React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > & {
+    count: number;
+    voteType: 'upvote' | 'downvote';
+  },
+) {
+  return (
+    <button
+      type="button"
+      className={`flex items-center size-8 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6558c7]/40 ${'text-black/45 hover:bg-white hover:text-[#6558c7]'}`}
+      aria-label={props.voteType === 'upvote' ? 'Upvote post' : 'Downvote post'}
+      {...props}
+    >
+      {props.voteType === 'upvote' ? (
+        <ArrowBigUp className="size-4" aria-hidden="true" />
+      ) : (
+        <ArrowBigDown className="size-4" aria-hidden="true" />
+      )}
+      {props.count}
+    </button>
   );
 }
 
