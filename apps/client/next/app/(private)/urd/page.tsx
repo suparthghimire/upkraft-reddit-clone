@@ -1,7 +1,7 @@
-import React from 'react';
+import DashboardChat from './_components/dashboard-chat';
 
 function DashboardPage() {
-  return <div>DashboardPage</div>;
+  return <DashboardChat />;
 }
 
 export default DashboardPage;

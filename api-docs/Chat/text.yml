@@ -1,0 +1,23 @@
+info:
+  name: text
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/api/v1/chat/text"
+  body:
+    type: json
+    data: |-
+      {
+        "message": "Can you tell me about the stars and stuff?",
+        "modelId": "gemini-3.6-flash-lite"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

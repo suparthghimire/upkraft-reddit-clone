@@ -16,7 +16,7 @@
     "seed": "tsx src/db/seed/index.ts",
     "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build",
     "migration:generate": "drizzle-kit generate --config ./src/drizzle.config.ts --name $1",
-    "migration:apply": "drizzle-kit migrajte --config ./src/drizzle.config.ts"
+    "migration:apply": "drizzle-kit migrate --config ./src/drizzle.config.ts"
   },
   "keywords": [],
   "author": "Suparth Narayan Ghimire",
@@ -40,10 +40,13 @@
     "typescript-eslint": "^8.45.0"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.76",
+    "@ai-sdk/openai": "^4.0.72",
     "@langchain/core": "^1.2.12",
     "@langchain/textsplitters": "^1.0.1",
     "@qdrant/js-client-rest": "^1.19.0",
     "@reddit-clone/shared": "workspace:*",
+    "ai": "^7.0.108",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -55,6 +58,6 @@
     "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   }
 }

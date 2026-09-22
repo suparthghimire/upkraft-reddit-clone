@@ -29,6 +29,11 @@ const envSchema = z.object({
   QDRANT_ENDPOINT: z.string().min(1, 'QDRANT_ENDPOINT is required and must be a valid string'),
   QDRANT_API_KEY: z.string().min(1, 'QDRANT_API_KEY is required and must be a valid string'),
   QDRANT_CLUSTER_ID: z.string().min(1, 'QDRANT_CLUSTER_ID is required and must be a valid string'),
+
+  // LLM
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+  OPEN_AI_API_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

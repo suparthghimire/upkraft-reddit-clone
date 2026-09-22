@@ -5,12 +5,11 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/post/search"
+  url: "{{BASE_URL}}/api/v1/post/search?q=Starts formation"
   params:
     - name: q
       value: Starts formation
       type: query
-      disabled: true
   auth: inherit
 
 settings:

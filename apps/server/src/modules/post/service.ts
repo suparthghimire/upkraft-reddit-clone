@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import { userColumns } from '../user/services.js';
 import { postUserVotesTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
-import { saveEmbedding } from '../qdrant/services.js';
+import { getSimilarEmbeddings, saveEmbedding } from '../qdrant/services.js';
 
 export function postColumns() {
   return {
@@ -170,4 +170,21 @@ export function updatePost(postId: number, post: PostUpdateInput) {
 
 export function deletePost(postId: number) {
   return dbInstance.delete(postsTable).where(eq(postsTable.id, postId));
+}
+
+export async function getRelavantPosts({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number | undefined;
+}) {
+  // Result
+  const result = await getSimilarEmbeddings<{ postId: number; chunkIndex: number }>(query, limit);
+
+  // Unique ids
+  const uniqueIds = [...new Set(result.map((r) => r.postId))];
+
+  const posts = await getAllPosts({ ids: uniqueIds });
+  return posts;
 }

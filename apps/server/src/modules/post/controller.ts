@@ -8,6 +8,7 @@ import {
   deletePost,
   getPostBySlug,
   votePost,
+  getRelavantPosts,
 } from './service.js';
 import { z } from 'zod';
 import { CustomError } from '../../http/error/customError.js';
@@ -130,13 +131,7 @@ export async function postSearchHandler(req: Request, res: Response) {
   const query = req.query.q as string;
   const limit = Number(req.query.limit) || 10;
 
-  // Result
-  const result = await getSimilarEmbeddings<{ postId: number; chunkIndex: number }>(query, limit);
-
-  // Unique ids
-  const uniqueIds = [...new Set(result.map((r) => r.postId))];
-
-  const posts = await getAllPosts({ ids: uniqueIds });
+  const posts = await getRelavantPosts({ query, limit });
 
   // Get the result from ids of the result
   return sendResponse({
