@@ -8,6 +8,8 @@ export class ErrorHandler {
 
   // Based on instance of err, return the response payload
   handle(): ResponseFormat {
+    console.log(this.error);
+
     if (this.error instanceof ZodError) {
       return this.handleZodError(this.error);
     } else if (this.error instanceof CustomError) {

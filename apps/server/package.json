@@ -13,9 +13,10 @@
     "lint:check": "eslint src/",
     "lint:write": "eslint src/ --fix",
     "lint": "pnpm run lint:check",
+    "seed": "tsx src/db/seed/index.ts",
     "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build",
     "migration:generate": "drizzle-kit generate --config ./src/drizzle.config.ts --name $1",
-    "migration:apply": "drizzle-kit migrate --config ./src/drizzle.config.ts"
+    "migration:apply": "drizzle-kit migrajte --config ./src/drizzle.config.ts"
   },
   "keywords": [],
   "author": "Suparth Narayan Ghimire",
@@ -39,6 +40,9 @@
     "typescript-eslint": "^8.45.0"
   },
   "dependencies": {
+    "@langchain/core": "^1.2.12",
+    "@langchain/textsplitters": "^1.0.1",
+    "@qdrant/js-client-rest": "^1.19.0",
     "@reddit-clone/shared": "workspace:*",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

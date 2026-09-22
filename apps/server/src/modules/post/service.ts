@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { userColumns } from '../user/services.js';
 import { postUserVotesTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
+import { saveEmbedding } from '../qdrant/services.js';
 
 export function postColumns() {
   return {
@@ -21,7 +22,7 @@ export function postColumns() {
 }
 
 export function getAllPosts(queryParams?: QueryParamSchema) {
-  const { title } = queryParams ?? {};
+  const { title, ids } = queryParams ?? {};
   return dbInstance.query.postsTable.findMany({
     columns: postColumns(),
     where: {
@@ -32,6 +33,7 @@ export function getAllPosts(queryParams?: QueryParamSchema) {
             },
           }
         : undefined),
+      ...(ids ? { id: { in: ids } } : undefined),
     },
     with: {
       user: {
@@ -72,10 +74,25 @@ export function getPostBySlug(slug: string) {
   });
 }
 
-export function createPost(args: { post: PostCreateInput; userId: number }) {
+export async function createPost(args: { post: PostCreateInput; userId: number }) {
   const { post, userId } = args;
   const slug = post.title.toLowerCase().replaceAll(' ', '-') + '-' + nanoid(6);
-  return dbInstance.insert(postsTable).values({ ...post, slug, user_id: userId });
+  const [createdPost] = await dbInstance
+    .insert(postsTable)
+    .values({ ...post, slug, user_id: userId })
+    .returning({ id: postsTable.id });
+
+  if (!createdPost) {
+    throw new Error('Post insert did not return a created post.');
+  }
+
+  await saveEmbedding({
+    postId: createdPost.id,
+    description: post.content,
+    title: post.title,
+  });
+
+  return createdPost;
 }
 
 export async function votePost(args: {

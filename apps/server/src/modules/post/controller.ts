@@ -12,6 +12,8 @@ import {
 import { z } from 'zod';
 import { CustomError } from '../../http/error/customError.js';
 import { queryParamSchema, type PostCreateInput, type PostUpdateInput } from '@reddit-clone/shared';
+import { getSimilarEmbeddings } from '../qdrant/services.js';
+import type { PostTable } from '../../db/schemas/index.js';
 
 export async function postIndexHandler(req: Request, res: Response) {
   const queryParams = queryParamSchema.parse(req.query);
@@ -121,5 +123,26 @@ export async function postDeleteHandler(req: Request, res: Response) {
     data: null,
     message: 'Post deleted successfully',
     statusCode: 201,
+  });
+}
+
+export async function postSearchHandler(req: Request, res: Response) {
+  const query = req.query.q as string;
+  const limit = Number(req.query.limit) || 10;
+
+  // Result
+  const result = await getSimilarEmbeddings<{ postId: number; chunkIndex: number }>(query, limit);
+
+  // Unique ids
+  const uniqueIds = [...new Set(result.map((r) => r.postId))];
+
+  const posts = await getAllPosts({ ids: uniqueIds });
+
+  // Get the result from ids of the result
+  return sendResponse({
+    res,
+    data: posts,
+    message: 'Search results retrieved successfully',
+    statusCode: 200,
   });
 }
