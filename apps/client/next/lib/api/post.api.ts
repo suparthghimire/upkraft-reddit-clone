@@ -13,8 +13,14 @@ export async function createNewPost(data: PostCreateInput) {
   return res.data;
 }
 
-export async function getAllPosts() {
-  const res = await axiosV1.get<ApiResponse<Post[]>>('/post');
+export async function getAllPosts(page=1,limit=10,title?:string) {
+  const res = await axiosV1.get<ApiResponse<Post[]>>('/post', {
+    params: {
+      page,
+      limit,
+      title,
+    },
+  });
   return res.data;
 }
 

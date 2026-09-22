@@ -1,7 +1,7 @@
 import type { PostCreateInput, PostUpdateInput, QueryParamSchema } from '@reddit-clone/shared';
 import { dbInstance } from '../../db/connection.js';
 import { postsTable } from '../../db/schemas/modules/post.table.js';
-import { and, eq } from 'drizzle-orm';
+import { and, eq,count, desc, like } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { userColumns } from '../user/services.js';
 import { postUserVotesTable } from '../../db/schemas/index.js';
@@ -19,8 +19,13 @@ export function postColumns() {
 }
 
 export function getAllPosts(queryParams?: QueryParamSchema) {
-  const { title } = queryParams ?? {};
-  return dbInstance.query.postsTable.findMany({
+
+  const {title, page = 1, limit = 10} = queryParams ?? {};
+  const offset = (page - 1) * limit;
+
+  const whereClause = title?like(postsTable.title, `%${title}%`):undefined;
+  
+  const [posts, totalResult] = await Promise.all([dbInstance.query.postsTable.findMany({
     columns: postColumns(),
     where: {
       ...(title
@@ -36,7 +41,29 @@ export function getAllPosts(queryParams?: QueryParamSchema) {
         columns: userColumns(),
       },
     },
-  });
+    limit,
+    offset,
+    orderBy: (postsTable, { desc }) => [desc(postsTable.created_at)],
+  }),
+   dbInstance
+   .select({count: count()})
+   .from(postsTable)
+   .where(whereClause)
+  ]);     
+
+  const total = totalResult[0]?.count ?? 0;
+  
+  return({
+    data: posts,
+    pagination: {
+      page, 
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPrevPage: page > 1,
+    }
+  })
 }
 
 export function getPostById(postId: number) {
