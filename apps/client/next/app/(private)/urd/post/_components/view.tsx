@@ -17,14 +17,12 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import { APP_ROUTES } from '@/lib/app-routes';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getUserData } from '@/lib/api/user.api';
+import { useMutation } from '@tanstack/react-query';
 import { useGetUserAPI } from '@/hooks/api/useUser';
 import { toast } from '@/components/ui/toast';
 import { CleanedUser } from '@reddit-clone/shared';
 import { voteOnPost } from '@/lib/api/post.api';
-
-type Vote = -1 | 0 | 1;
+import CommentsSection from '@/app/(private)/urd/post/_components/comments-section';
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
@@ -49,16 +47,11 @@ function getReadingTime(content: string) {
 }
 
 function PostView({ post }: { post: Post }) {
-  const [vote, setVote] = useState<Vote>(0);
   const [isSaved, setIsSaved] = useState(false);
   const [wasCopied, setWasCopied] = useState(false);
   const { data: currentUser } = useGetUserAPI();
 
   const wasEdited = toDate(post.updated_at).getTime() !== toDate(post.created_at).getTime();
-
-  function castVote(nextVote: Exclude<Vote, 0>) {
-    setVote((currentVote) => (currentVote === nextVote ? 0 : nextVote));
-  }
 
   async function sharePost() {
     const shareData = { title: post.title, url: window.location.href };
@@ -93,82 +86,86 @@ function PostView({ post }: { post: Post }) {
       </Link>
 
       <div className="mt-6 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_230px] lg:gap-7">
-        <article className="overflow-hidden rounded-3xl border border-black/8 bg-white shadow-[0_18px_60px_rgba(42,37,28,0.07)]">
-          <header className="border-b border-black/7 px-5 py-8 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
-            <div className="flex items-center gap-3.5">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#ffede7] text-sm font-bold text-[#c43f18]">
-                {post.user.name.trim().charAt(0).toUpperCase() || 'U'}
-              </span>
-              <div>
-                <p className="text-xs font-semibold text-black/65">{post.user.name}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-black/42">
-                  <time dateTime={toDate(post.created_at).toISOString()}>
-                    {formatDate(post.created_at)}
-                  </time>
-                  <span className="size-0.5 rounded-full bg-black/25" aria-hidden="true" />
-                  <span className="inline-flex items-center gap-1">
-                    <Clock3 className="size-3" aria-hidden="true" />
-                    {getReadingTime(post.content)} min read
-                  </span>
+        <div className="min-w-0 space-y-5">
+          <article className="overflow-hidden rounded-3xl border border-black/8 bg-white shadow-[0_18px_60px_rgba(42,37,28,0.07)]">
+            <header className="border-b border-black/7 px-5 py-8 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+              <div className="flex items-center gap-3.5">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#ffede7] text-sm font-bold text-[#c43f18]">
+                  {post.user.name.trim().charAt(0).toUpperCase() || 'U'}
+                </span>
+                <div>
+                  <p className="text-xs font-semibold text-black/65">{post.user.name}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-medium text-black/42">
+                    <time dateTime={toDate(post.created_at).toISOString()}>
+                      {formatDate(post.created_at)}
+                    </time>
+                    <span className="size-0.5 rounded-full bg-black/25" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-1">
+                      <Clock3 className="size-3" aria-hidden="true" />
+                      {getReadingTime(post.content)} min read
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              <h1 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-balance sm:text-4xl lg:text-5xl">
+                {post.title}
+              </h1>
+
+              {wasEdited ? (
+                <p className="mt-5 inline-flex items-center gap-1.5 text-[11px] font-medium text-black/38">
+                  <Edit3 className="size-3" aria-hidden="true" />
+                  Last edited {formatDate(post.updated_at)}
+                </p>
+              ) : null}
+            </header>
+
+            <div className="px-5 py-8 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+              <div className="max-w-3xl whitespace-pre-wrap wrap-break-word text-[15px] leading-8 text-black/70 sm:text-base">
+                {post.content}
               </div>
             </div>
 
-            <h1 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-balance sm:text-4xl lg:text-5xl">
-              {post.title}
-            </h1>
+            <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-black/7 bg-[#fbfaf7] px-5 py-4 sm:px-9 lg:px-12">
+              {currentUser?.data && <PostVoteActions post={post} currentUser={currentUser.data} />}
 
-            {wasEdited ? (
-              <p className="mt-5 inline-flex items-center gap-1.5 text-[11px] font-medium text-black/38">
-                <Edit3 className="size-3" aria-hidden="true" />
-                Last edited {formatDate(post.updated_at)}
-              </p>
-            ) : null}
-          </header>
-
-          <div className="px-5 py-8 sm:px-9 sm:py-10 lg:px-12 lg:py-12">
-            <div className="max-w-3xl whitespace-pre-wrap wrap-break-word text-[15px] leading-8 text-black/70 sm:text-base">
-              {post.content}
-            </div>
-          </div>
-
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-black/7 bg-[#fbfaf7] px-5 py-4 sm:px-9 lg:px-12">
-            {currentUser?.data && <PostVoteActions post={post} currentUser={currentUser.data} />}
-
-            <div className="flex items-center justify-end gap-1.5">
-              {currentUser?.data && (
+              <div className="flex items-center justify-end gap-1.5">
+                {currentUser?.data && (
+                  <button
+                    type="button"
+                    onClick={() => setIsSaved((currentValue) => !currentValue)}
+                    className={`inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40 ${
+                      isSaved
+                        ? 'bg-[#fff0eb] text-[#c64220]'
+                        : 'text-black/50 hover:bg-black/5 hover:text-black/75'
+                    }`}
+                    aria-pressed={isSaved}
+                  >
+                    <Bookmark
+                      className={`size-3.5 ${isSaved ? 'fill-current' : ''}`}
+                      aria-hidden="true"
+                    />
+                    {isSaved ? 'Saved' : 'Save'}
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => setIsSaved((currentValue) => !currentValue)}
-                  className={`inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40 ${
-                    isSaved
-                      ? 'bg-[#fff0eb] text-[#c64220]'
-                      : 'text-black/50 hover:bg-black/5 hover:text-black/75'
-                  }`}
-                  aria-pressed={isSaved}
+                  onClick={sharePost}
+                  className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-black/50 transition hover:bg-black/5 hover:text-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40"
                 >
-                  <Bookmark
-                    className={`size-3.5 ${isSaved ? 'fill-current' : ''}`}
-                    aria-hidden="true"
-                  />
-                  {isSaved ? 'Saved' : 'Save'}
+                  {wasCopied ? (
+                    <Check className="size-3.5 text-[#17674f]" aria-hidden="true" />
+                  ) : (
+                    <Share2 className="size-3.5" aria-hidden="true" />
+                  )}
+                  {wasCopied ? 'Copied' : 'Share'}
                 </button>
-              )}
-              <button
-                type="button"
-                onClick={sharePost}
-                className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-black/50 transition hover:bg-black/5 hover:text-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ee5a2f]/40"
-              >
-                {wasCopied ? (
-                  <Check className="size-3.5 text-[#17674f]" aria-hidden="true" />
-                ) : (
-                  <Share2 className="size-3.5" aria-hidden="true" />
-                )}
-                {wasCopied ? 'Copied' : 'Share'}
-              </button>
-            </div>
-          </footer>
-        </article>
+              </div>
+            </footer>
+          </article>
+
+          <CommentsSection postId={post.id} />
+        </div>
 
         <aside className="space-y-3 lg:sticky lg:top-6">
           <div className="rounded-2xl border border-black/8 bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.04)]">
@@ -296,19 +293,20 @@ function VoteButton(
     voteType: 'upvote' | 'downvote';
   },
 ) {
+  const { voteType, count, ...rest } = props;
   return (
     <button
       type="button"
       className={`flex items-center size-8 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6558c7]/40 ${'text-black/45 hover:bg-white hover:text-[#6558c7]'}`}
-      aria-label={props.voteType === 'upvote' ? 'Upvote post' : 'Downvote post'}
-      {...props}
+      aria-label={voteType === 'upvote' ? 'Upvote post' : 'Downvote post'}
+      {...rest}
     >
-      {props.voteType === 'upvote' ? (
+      {voteType === 'upvote' ? (
         <ArrowBigUp className="size-4" aria-hidden="true" />
       ) : (
         <ArrowBigDown className="size-4" aria-hidden="true" />
       )}
-      {props.count}
+      {count}
     </button>
   );
 }

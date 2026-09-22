@@ -4,3 +4,5 @@ export * from './http/types.js';
 export * from './schemas/queryParams.schema.js';
 export * from './schemas/auth.schema.js';
 export * from './types/user.types.js';
+export * from './schemas/comment.schema.js';
+export * from './utils/date.utils.js';
