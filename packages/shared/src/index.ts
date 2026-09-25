@@ -6,3 +6,4 @@ export * from './schemas/auth.schema.js';
 export * from './types/user.types.js';
 export * from './schemas/comment.schema.js';
 export * from './utils/date.utils.js';
+export * from './utils/string.utils.js';

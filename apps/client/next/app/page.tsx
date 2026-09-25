@@ -2,9 +2,10 @@ import { getAllPosts } from '@/lib/api/post.api';
 import PostList from './(private)/urd/post/_components/list';
 
 export default async function Home() {
-  const post = await getAllPosts();
+  const postsResponse = await getAllPosts({ limit: 10 });
 
-  if (post.data) return <PostList posts={post.data} />;
+  if (postsResponse.data)
+    return <PostList count={postsResponse.count} postsResponse={postsResponse} />;
 
   return null;
 }

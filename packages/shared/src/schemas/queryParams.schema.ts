@@ -4,7 +4,7 @@ export const queryParamSchema = z.looseObject({
   title: z.string().optional(),
   ids: z.array(z.number()).optional(),
   q: z.string().optional(),
-  limit: z.number().optional(),
+  limit: z.coerce.number().optional(),
   sortKey: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });

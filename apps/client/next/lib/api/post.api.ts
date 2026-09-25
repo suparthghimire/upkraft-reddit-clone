@@ -1,4 +1,9 @@
-import { ApiResponse, PostCreateInput, PostVoteInput } from '@reddit-clone/shared';
+import {
+  ApiResponse,
+  PostCreateInput,
+  PostVoteInput,
+  QueryParamSchema,
+} from '@reddit-clone/shared';
 import { axiosV1 } from '../axios';
 import { Post } from '../types/post.types';
 
@@ -13,8 +18,14 @@ export async function createNewPost(data: PostCreateInput) {
   return res.data;
 }
 
-export async function getAllPosts() {
-  const res = await axiosV1.get<ApiResponse<Post[]>>('/post');
+export async function getAllPosts(queryParams?: QueryParamSchema) {
+  const params = new URLSearchParams(queryParams);
+
+  console.log({ queryParams });
+
+  const res = await axiosV1.get<ApiResponse<Post[]>>('/post', {
+    params,
+  });
   return res.data;
 }
 
