@@ -8,6 +8,7 @@ export function formatResponse<T>(args: ResponseFormat<T>): ResponseFormat<T> {
     message: args.message,
     statusCode: args.statusCode,
     data: args.data ?? null,
+    count: args.count ?? undefined,
   };
 }
 

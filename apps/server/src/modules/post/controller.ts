@@ -2,12 +2,13 @@ import type { Request, Response } from 'express';
 import { sendResponse } from '../../http/response/index.js';
 import {
   createPost,
-  getAllPosts,
   getPostById,
   updatePost,
   deletePost,
   getPostBySlug,
+  searchPosts,
   votePost,
+  countAllPosts,
 } from './service.js';
 import { z } from 'zod';
 import { CustomError } from '../../http/error/customError.js';
@@ -16,13 +17,17 @@ import { queryParamSchema, type PostCreateInput, type PostUpdateInput } from '@r
 export async function postIndexHandler(req: Request, res: Response) {
   const queryParams = queryParamSchema.parse(req.query);
 
-  const posts = await getAllPosts(queryParams);
+  const $posts = searchPosts(queryParams);
+  const $postsCount = countAllPosts();
+
+  const [posts, postsCount] = await Promise.all([$posts, $postsCount]);
 
   return sendResponse({
     res,
     data: posts,
     message: 'Posts retrieved successfully',
     statusCode: 200,
+    count: postsCount,
   });
 }
 

@@ -5,12 +5,15 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/post"
+  url: "{{BASE_URL}}/api/v1/post?q=spices in nepali cuisine"
   params:
     - name: title
-      value: abc
+      value: ""
       type: query
       disabled: true
+    - name: q
+      value: spices in nepali cuisine
+      type: query
   auth: inherit
 
 settings:

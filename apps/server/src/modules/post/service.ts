@@ -1,12 +1,13 @@
 import type { PostCreateInput, PostUpdateInput, QueryParamSchema } from '@reddit-clone/shared';
 import { dbInstance } from '../../db/connection.js';
 import { postsTable } from '../../db/schemas/modules/post.table.js';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, QueryPromise } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { userColumns } from '../user/services.js';
 import { postUserVotesTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
-
+import { getSimilarEmbeddings, splitTextIntoChunks, storeEmbedding } from '../qdrant/services.js';
+import fs from 'fs/promises';
 export function postColumns() {
   return {
     id: true,
@@ -21,7 +22,7 @@ export function postColumns() {
 }
 
 export function getAllPosts(queryParams?: QueryParamSchema) {
-  const { title } = queryParams ?? {};
+  const { title, limit, sortKey, sortOrder, ids } = queryParams ?? {};
   return dbInstance.query.postsTable.findMany({
     columns: postColumns(),
     where: {
@@ -32,13 +33,51 @@ export function getAllPosts(queryParams?: QueryParamSchema) {
             },
           }
         : undefined),
+      ...(ids ? { id: { in: ids } } : undefined),
     },
     with: {
       user: {
         columns: userColumns(),
       },
     },
+    limit: limit,
+    orderBy: sortKey
+      ? {
+          [sortKey]: sortOrder ?? 'asc',
+        }
+      : undefined,
   });
+}
+
+export async function countAllPosts() {
+  return dbInstance.$count(postsTable);
+}
+
+export async function searchPosts(queryParams?: QueryParamSchema) {
+  if (!queryParams) {
+    // Get all posts uptp 10 items
+    return getAllPosts(queryParams);
+  }
+
+  if (queryParams.q) {
+    // Find relevant posts based on query string from qdrant
+    const similarPosts = await getSimilarEmbeddings<{ id: number; title: string; content: string }>(
+      {
+        query: queryParams.q,
+        limit: queryParams.limit,
+      },
+    );
+
+    // Get unique posts based on their ids
+    const uniqueIds = [...new Set(similarPosts.map((post) => post.id))];
+
+    return getAllPosts({
+      ...queryParams,
+      ids: uniqueIds,
+    });
+  }
+
+  return getAllPosts(queryParams);
 }
 
 export function getPostById(postId: number) {
@@ -72,10 +111,28 @@ export function getPostBySlug(slug: string) {
   });
 }
 
-export function createPost(args: { post: PostCreateInput; userId: number }) {
+export async function createPost(args: { post: PostCreateInput; userId: number }) {
   const { post, userId } = args;
   const slug = post.title.toLowerCase().replaceAll(' ', '-') + '-' + nanoid(6);
-  return dbInstance.insert(postsTable).values({ ...post, slug, user_id: userId });
+
+  const [row] = await dbInstance
+    .insert(postsTable)
+    .values({ ...post, slug, user_id: userId })
+    .returning({
+      id: postsTable.id,
+    });
+
+  if (!row) throw new CustomError('Failed to create post', 500);
+
+  const { id } = row;
+
+  await storeEmbedding({
+    id,
+    title: post.title,
+    content: post.content,
+  });
+
+  return true;
 }
 
 export async function votePost(args: {

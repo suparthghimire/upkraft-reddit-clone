@@ -58,6 +58,7 @@ export class CustomServer {
   registerRequestErrorHandler() {
     this.app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
       const handledError = new ErrorHandler(err);
+      console.log(err);
       const responsePayload = handledError.handle();
       return sendResponse({
         res,

@@ -58,7 +58,12 @@ export async function signup(body: SignupInput) {
   const salt = await bcrypt.genSalt(10);
   const hasnedPassword = await bcrypt.hash(body.password, salt);
 
-  return dbInstance.insert(usersTable).values({ ...body, password: hasnedPassword });
+  return dbInstance
+    .insert(usersTable)
+    .values({ ...body, password: hasnedPassword })
+    .returning({
+      id: usersTable.id,
+    });
 }
 
 export async function logout(res: Response) {
