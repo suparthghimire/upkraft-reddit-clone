@@ -20,6 +20,7 @@
     "turbo": "^2.10.12"
   },
   "devDependencies": {
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "typescript": "5.9.3"
   }
 }

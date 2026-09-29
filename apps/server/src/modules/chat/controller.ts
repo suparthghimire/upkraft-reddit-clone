@@ -1,21 +1,8 @@
 import type { Request, Response } from 'express';
-import type { ChatMessageSchema } from '@reddit-clone/shared';
+import type { ChatEventArgs, ChatMessageSchema, ChatUIMessage } from '@reddit-clone/shared';
 import { getChatProvider } from './providers/factory.js';
-import {
-  createUIMessageStream,
-  pipeUIMessageStreamToResponse,
-  toUIMessageStream,
-  type UIMessage,
-} from 'ai';
-import type { ChatEventArgs } from './providers/interface.js';
+import { ai } from '@reddit-clone/shared';
 import { getOrCreateAIUsage } from '../user/services.js';
-
-type UIMessageType = UIMessage<
-  unknown,
-  {
-    event: ChatEventArgs;
-  }
->;
 
 function handleError(error: unknown) {
   console.log(error);
@@ -25,15 +12,19 @@ function handleError(error: unknown) {
 export async function chatStreamHandler(req: Request, res: Response) {
   const { message, model, provider, reasoning } = req.validatedBody as ChatMessageSchema;
   const user = res.locals.user;
-  const providerInstance = getChatProvider(provider);
   const abortController = new AbortController();
 
   res.once('close', () => {
     if (!res.writableEnded) abortController.abort();
   });
 
-  const stream = createUIMessageStream<UIMessageType>({
+  let persistUsage: (() => Promise<void>) | undefined;
+
+  const stream = ai.createUIMessageStream<ChatUIMessage>({
     onError: handleError,
+    onFinish: async () => {
+      await persistUsage?.();
+    },
     execute: async ({ writer }) => {
       writer.write({
         type: 'start',
@@ -47,23 +38,27 @@ export async function chatStreamHandler(req: Request, res: Response) {
         });
       }
 
-      emit({ response: 'Attempting to search the knowledge base', state: 'think' });
+      const providerInstance = getChatProvider(provider);
+
+      emit({ state: 'think', response: 'Thinking through your question...' });
 
       const result = providerInstance.streamMessage({
         message,
         model,
         provider,
         reasoning,
-        onEvent: emit,
       });
 
-      const usage = await result.usage;
-      await getOrCreateAIUsage(user.id, usage);
+      persistUsage = async () => {
+        const usage = await result.usage;
+        await getOrCreateAIUsage(user.id, usage);
+      };
 
       writer.merge(
-        toUIMessageStream({
+        ai.toUIMessageStream({
           stream: result.stream,
           sendStart: false,
+          sendReasoning: true,
           onError: handleError,
         }),
       );
@@ -71,7 +66,7 @@ export async function chatStreamHandler(req: Request, res: Response) {
   });
 
   try {
-    return await pipeUIMessageStreamToResponse({
+    return await ai.pipeUIMessageStreamToResponse({
       response: res,
       stream,
       headers: {
