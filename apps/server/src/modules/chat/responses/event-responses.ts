@@ -1,27 +1,23 @@
-import type { ChatEventArgs, StreamMessageArgs } from '../providers/interface.js';
+import type { StreamMessageArgs } from '../providers/interface.js';
 
 export function createStreamResponseEvent(args: StreamMessageArgs) {
-  function emit(event: ChatEventArgs) {
-    args.onEvent?.(event);
-  }
-
   let hasStartedResponse = false;
 
   return {
     onStepStart: ({ stepNumber }: { stepNumber: number }) => {
       if (stepNumber > 0) {
-        emit({ state: 'think', response: 'Creating a response' });
+        args.onEvent?.({ state: 'think', response: 'Creating a response' });
       }
     },
     onToolExecutionStart: ({ toolCall }: { toolCall: { toolName: string } }) => {
       if (toolCall.toolName === 'search_kb') {
-        emit({ state: 'tool', response: 'Searching the knowledge base' });
+        args.onEvent?.({ state: 'tool', response: 'Searching the knowledge base' });
       }
     },
     onToolExecutionEnd: ({ toolCall }: { toolCall: { toolName: string } }) => {
-      if (toolCall.toolName === 'search_kb') return;
+      if (toolCall.toolName !== 'search_kb') return;
 
-      emit({
+      args.onEvent?.({
         state: 'tool',
         response: 'Found the information from the knowledge base',
       });
@@ -32,16 +28,11 @@ export function createStreamResponseEvent(args: StreamMessageArgs) {
 
       if (!hasStartedResponse) {
         hasStartedResponse = true;
-        emit({
+        args.onEvent?.({
           state: 'response',
           response: 'Sending response...',
         });
       }
-
-      emit({
-        state: 'message',
-        response: chunk.text,
-      });
     },
   };
 }

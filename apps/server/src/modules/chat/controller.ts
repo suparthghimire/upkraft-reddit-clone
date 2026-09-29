@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import { sendResponse } from '../../http/response/index.js';
 import type { ChatMessageSchema } from '@reddit-clone/shared';
 import { getChatProvider } from './providers/factory.js';
 import {
@@ -9,6 +8,7 @@ import {
   type UIMessage,
 } from 'ai';
 import type { ChatEventArgs } from './providers/interface.js';
+import { getOrCreateAIUsage } from '../user/services.js';
 
 type UIMessageType = UIMessage<
   unknown,
@@ -24,6 +24,7 @@ function handleError(error: unknown) {
 
 export async function chatStreamHandler(req: Request, res: Response) {
   const { message, model, provider, reasoning } = req.validatedBody as ChatMessageSchema;
+  const user = res.locals.user;
   const providerInstance = getChatProvider(provider);
   const abortController = new AbortController();
 
@@ -53,7 +54,11 @@ export async function chatStreamHandler(req: Request, res: Response) {
         model,
         provider,
         reasoning,
+        onEvent: emit,
       });
+
+      const usage = await result.usage;
+      await getOrCreateAIUsage(user.id, usage);
 
       writer.merge(
         toUIMessageStream({

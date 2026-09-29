@@ -7,6 +7,7 @@ export const appRelations = defineRelations(
     postsTable: schema.postsTable,
     postUserVotesTable: schema.postUserVotesTable,
     commentsTable: schema.commentsTable,
+    aiUsageTable: schema.aiUsageTable,
   },
   (r) => ({
     postsTable: {
@@ -24,6 +25,10 @@ export const appRelations = defineRelations(
       }),
     },
     usersTable: {
+      aiUsage: r.one.aiUsageTable({
+        from: r.usersTable.id,
+        to: r.aiUsageTable.user_id,
+      }),
       votes: r.many.postUserVotesTable({
         from: r.usersTable.id,
         to: r.postUserVotesTable.user_id,
@@ -64,6 +69,12 @@ export const appRelations = defineRelations(
       childComments: r.many.commentsTable({
         from: r.commentsTable.id,
         to: r.commentsTable.parent_comment_id,
+      }),
+    },
+    aiUsageTable: {
+      user: r.one.usersTable({
+        from: r.aiUsageTable.user_id,
+        to: r.usersTable.id,
       }),
     },
   }),

@@ -1,7 +1,7 @@
 import type { ChatMessageSchema } from '@reddit-clone/shared';
 import type { StreamTextResult } from 'ai';
 
-export type ChatMessageState = 'think' | 'tool' | 'response' | 'message';
+export type ChatMessageState = 'think' | 'tool' | 'response';
 
 export type ChatEventArgs = {
   state: ChatMessageState;

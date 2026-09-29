@@ -1,4 +1,6 @@
+import type { LanguageModelUsage } from 'ai';
 import { dbInstance } from '../../db/connection.js';
+import { aiUsageTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
 
 export function userColumns() {
@@ -25,4 +27,19 @@ export async function getUserById(userId: number) {
   if (!user) throw new CustomError('User not found', 404);
 
   return user;
+}
+
+export async function getOrCreateAIUsage(userId: number, usage: LanguageModelUsage) {
+  await dbInstance
+    .insert(aiUsageTable)
+    .values({
+      usageJSON: usage,
+      user_id: userId,
+    })
+    .onConflictDoUpdate({
+      target: aiUsageTable.user_id,
+      set: {
+        usageJSON: usage,
+      },
+    });
 }
