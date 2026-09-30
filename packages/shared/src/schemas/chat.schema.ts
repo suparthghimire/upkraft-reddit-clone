@@ -16,4 +16,9 @@ export const chatMessageSchema = z
   })
   .and(providerSchema);
 
+export const ModelToProviderMap = {
+  'gpt-5.6-luna': 'openai',
+  'gpt-6-luna': 'openai',
+};
+
 export type ChatMessageSchema = z.infer<typeof chatMessageSchema>;
