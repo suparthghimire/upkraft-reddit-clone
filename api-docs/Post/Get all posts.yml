@@ -5,15 +5,15 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/post?q=spices in nepali cuisine"
+  url: "{{BASE_URL}}/api/v1/post?title=Radom post"
   params:
     - name: title
-      value: ""
+      value: Radom post
       type: query
-      disabled: true
     - name: q
       value: spices in nepali cuisine
       type: query
+      disabled: true
   auth: inherit
 
 settings:

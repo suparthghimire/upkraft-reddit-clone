@@ -21,8 +21,6 @@ export async function createNewPost(data: PostCreateInput) {
 export async function getAllPosts(queryParams?: QueryParamSchema) {
   const params = new URLSearchParams(queryParams);
 
-  console.log({ queryParams });
-
   const res = await axiosV1.get<ApiResponse<Post[]>>('/post', {
     params,
   });

@@ -1,0 +1,23 @@
+info:
+  name: Generate presigned url
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/api/v1/s3/presigned-url"
+  body:
+    type: json
+    data: |-
+      {
+        "fileName": "suparth.png",
+        "contentType": "image/jpeg"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

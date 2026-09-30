@@ -18,6 +18,8 @@ export const postsTable = pgTable(
     total_upvotes: integer().notNull().default(0),
     total_downvotes: integer().notNull().default(0),
 
+    imageS3Keys: text().array().notNull().default([]),
+
     updated_at: timestamp()
       .notNull()
       .$onUpdateFn(() => new Date()),

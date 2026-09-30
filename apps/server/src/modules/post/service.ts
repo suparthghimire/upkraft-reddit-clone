@@ -8,6 +8,7 @@ import { postUserVotesTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
 import { getSimilarEmbeddings, splitTextIntoChunks, storeEmbedding } from '../qdrant/services.js';
 import fs from 'fs/promises';
+import { generatePresignedUrl } from '../s3/service.js';
 export function postColumns() {
   return {
     id: true,
@@ -15,6 +16,7 @@ export function postColumns() {
     title: true,
     created_at: true,
     slug: true,
+    imageS3Keys: true,
     updated_at: true,
     total_upvotes: true,
     total_downvotes: true,
@@ -80,8 +82,8 @@ export async function searchPosts(queryParams?: QueryParamSchema) {
   return getAllPosts(queryParams);
 }
 
-export function getPostById(postId: number) {
-  return dbInstance.query.postsTable.findFirst({
+export async function getPostById(postId: number) {
+  const post = await dbInstance.query.postsTable.findFirst({
     columns: postColumns(),
 
     where: {
@@ -94,6 +96,16 @@ export function getPostById(postId: number) {
       votes: true,
     },
   });
+
+  const imageS3Keys = post?.imageS3Keys ?? [];
+  const presignedUrls: Record<string, string> = {};
+  for (const key of imageS3Keys) {
+    // Generate pre-signed URL for each image S3 key
+    const presignedUrl = await generatePresignedUrl(key);
+    presignedUrls[key] = presignedUrl;
+  }
+
+  return { ...post, presignedUrls };
 }
 
 export function getPostBySlug(slug: string) {
