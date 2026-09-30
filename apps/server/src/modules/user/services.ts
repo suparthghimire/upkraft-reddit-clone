@@ -1,4 +1,4 @@
-import type { LanguageModelUsage } from 'ai';
+import { ai } from '@reddit-clone/shared';
 import { dbInstance } from '../../db/connection.js';
 import { aiUsageTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
@@ -29,17 +29,9 @@ export async function getUserById(userId: number) {
   return user;
 }
 
-export async function getOrCreateAIUsage(userId: number, usage: LanguageModelUsage) {
-  await dbInstance
-    .insert(aiUsageTable)
-    .values({
-      usageJSON: usage,
-      user_id: userId,
-    })
-    .onConflictDoUpdate({
-      target: aiUsageTable.user_id,
-      set: {
-        usageJSON: usage,
-      },
-    });
+export async function getOrCreateAIUsage(userId: number, usage: ai.LanguageModelUsage) {
+  await dbInstance.insert(aiUsageTable).values({
+    usageJSON: usage,
+    user_id: userId,
+  });
 }

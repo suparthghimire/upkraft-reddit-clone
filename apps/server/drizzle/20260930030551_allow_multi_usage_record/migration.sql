@@ -1,0 +1,1 @@
+ALTER TABLE "ai-usage" DROP CONSTRAINT "ai-usage_user_id_key";

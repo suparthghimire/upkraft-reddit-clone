@@ -25,7 +25,7 @@ export const appRelations = defineRelations(
       }),
     },
     usersTable: {
-      aiUsage: r.one.aiUsageTable({
+      aiUsage: r.many.aiUsageTable({
         from: r.usersTable.id,
         to: r.aiUsageTable.user_id,
       }),
