@@ -1,5 +1,5 @@
 import type { ChatMessageSchema } from '@reddit-clone/shared';
-import type { StreamTextResult } from 'ai';
+import { ai } from '@reddit-clone/shared';
 
 export type ChatMessageState = 'think' | 'tool' | 'response';
 
@@ -10,9 +10,8 @@ export type ChatEventArgs = {
 
 export type StreamMessageArgs = ChatMessageSchema & {
   abortSignal?: AbortSignal;
-  onEvent?: (state: ChatEventArgs) => void;
 };
 
 export interface ChatProvider {
-  streamMessage: (args: StreamMessageArgs) => StreamTextResult<any, any, any>;
+  streamMessage: (args: StreamMessageArgs) => ai.StreamTextResult<any, any, any>;
 }

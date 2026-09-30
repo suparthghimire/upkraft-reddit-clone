@@ -44,7 +44,6 @@
     "@langchain/textsplitters": "^1.0.1",
     "@qdrant/js-client-rest": "^1.19.0",
     "@reddit-clone/shared": "workspace:*",
-    "ai": "^7.0.118",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

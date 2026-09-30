@@ -1,16 +1,11 @@
 import type { Request, Response } from 'express';
 import type { ChatMessageSchema } from '@reddit-clone/shared';
 import { getChatProvider } from './providers/factory.js';
-import {
-  createUIMessageStream,
-  pipeUIMessageStreamToResponse,
-  toUIMessageStream,
-  type UIMessage,
-} from 'ai';
+import { ai } from '@reddit-clone/shared';
 import type { ChatEventArgs } from './providers/interface.js';
 import { getOrCreateAIUsage } from '../user/services.js';
 
-type UIMessageType = UIMessage<
+type UIMessageType = ai.UIMessage<
   unknown,
   {
     event: ChatEventArgs;
@@ -32,8 +27,13 @@ export async function chatStreamHandler(req: Request, res: Response) {
     if (!res.writableEnded) abortController.abort();
   });
 
-  const stream = createUIMessageStream<UIMessageType>({
+  let persistUsage: () => Promise<void>;
+
+  const stream = ai.createUIMessageStream<UIMessageType>({
     onError: handleError,
+    onEnd: async () => {
+      await persistUsage?.();
+    },
     execute: async ({ writer }) => {
       writer.write({
         type: 'start',
@@ -47,23 +47,25 @@ export async function chatStreamHandler(req: Request, res: Response) {
         });
       }
 
-      emit({ response: 'Attempting to search the knowledge base', state: 'think' });
+      emit({ response: 'Thinking about your question...', state: 'think' });
 
       const result = providerInstance.streamMessage({
         message,
         model,
         provider,
         reasoning,
-        onEvent: emit,
       });
 
-      const usage = await result.usage;
-      await getOrCreateAIUsage(user.id, usage);
+      persistUsage = async () => {
+        const usage = await result.usage;
+        await getOrCreateAIUsage(user.id, usage);
+      };
 
       writer.merge(
-        toUIMessageStream({
+        ai.toUIMessageStream({
           stream: result.stream,
           sendStart: false,
+          sendReasoning: true,
           onError: handleError,
         }),
       );
@@ -71,7 +73,7 @@ export async function chatStreamHandler(req: Request, res: Response) {
   });
 
   try {
-    return await pipeUIMessageStreamToResponse({
+    return await ai.pipeUIMessageStreamToResponse({
       response: res,
       stream,
       headers: {
