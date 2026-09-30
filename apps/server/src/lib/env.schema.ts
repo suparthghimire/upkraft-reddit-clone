@@ -27,6 +27,9 @@ const envSchema = z.object({
     .string('ACCESS_TOKEN_SECRET is required and must be a valid string')
     .min(1, 'ACCESS_TOKEN_SECRET is required and must be a valid string'),
 
+  STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
+
   QDRANT_API_KEY: z.string().min(1, 'QDRANT_API_KEY is required and must be a valid string'),
   QDRANT_ENDPOINT: z.string().min(1, 'QDRANT_ENDPOINT is required and must be a valid string'),
 

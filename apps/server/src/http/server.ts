@@ -2,6 +2,7 @@ import express, {
   type Router,
   type Express,
   type Request,
+  type RequestHandler,
   type Response,
   type NextFunction,
 } from 'express';
@@ -12,6 +13,7 @@ import cookieParser from 'cookie-parser';
 import { env } from '../lib/env.schema.js';
 export class CustomServer {
   public app: Express;
+  private jsonBodyParser: RequestHandler = express.json();
 
   constructor() {
     this.app = express();
@@ -25,7 +27,19 @@ export class CustomServer {
     return this;
   }
 
-  regsiterRequiredMiddlewares() {
+  stripeRawBodyVerification() {
+    this.jsonBodyParser = express.json({
+      verify: (req, res, rawBody) => {
+        if (req.url?.split('?')[0] === '/api/v1/stripe/webhook') {
+          (res as Response).locals.stripeRawBody = rawBody;
+        }
+      },
+    });
+
+    return this;
+  }
+
+  registerRequiredMiddlewares() {
     this.app.use(
       cors({
         origin: env.WHITE_LISTED_FE_ORIGINS,
@@ -34,7 +48,7 @@ export class CustomServer {
     );
     this.app.use(cookieParser());
 
-    this.app.use(express.json());
+    this.app.use(this.jsonBodyParser);
 
     return this;
   }

@@ -1,18 +1,17 @@
 import { CustomServer } from './http/server.js';
-import { env } from './lib/env.schema.js';
 import { authRouter } from './modules/auth/routes.js';
 import { chatRouter } from './modules/chat/routes.js';
 import { commentRouter } from './modules/comment/routes.js';
 import { postRouter } from './modules/post/routes.js';
 import { s3Router } from './modules/s3/routes.js';
+import { stripeRouter } from './modules/stripe/routes.js';
 import { userRouter } from './modules/user/routes.js';
 const server = new CustomServer();
 
-console.log(env.DATABASE_URL);
-
 server
   .startServer()
-  .regsiterRequiredMiddlewares()
+  .stripeRawBodyVerification()
+  .registerRequiredMiddlewares()
   .registerHealthCheckRoute()
   .registerModuleRouter('v1', 'post', postRouter)
   .registerModuleRouter('v1', 'auth', authRouter)
@@ -20,4 +19,5 @@ server
   .registerModuleRouter('v1', 'comment', commentRouter)
   .registerModuleRouter('v1', 'chat', chatRouter)
   .registerModuleRouter('v1', 's3', s3Router)
+  .registerModuleRouter('v1', 'stripe', stripeRouter)
   .registerRequestErrorHandler();

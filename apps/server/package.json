@@ -14,6 +14,7 @@
     "lint:write": "eslint src/ --fix",
     "lint": "pnpm run lint:check",
     "seed": "tsx src/db/seed/seed.ts",
+    "stripe:setup": "tsx src/modules/stripe/setup-stripe-products.ts",
     "pr:check": "pnpm run format:check && pnpm run lint:check && pnpm run type-check && pnpm run build",
     "migration:generate": "drizzle-kit generate --config ./src/drizzle.config.ts --name $1",
     "migration:apply": "drizzle-kit migrate --config ./src/drizzle.config.ts"
@@ -57,6 +58,7 @@
     "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "stripe": "^22.6.2",
     "zod": "^4.4.3"
   }
 }

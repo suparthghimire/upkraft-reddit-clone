@@ -1,4 +1,6 @@
 import type { UserTable } from '../../db/schemas/index.js';
+import type { Buffer } from 'node:buffer';
+import type Stripe from 'stripe';
 
 declare global {
   namespace Express {
@@ -8,6 +10,8 @@ declare global {
 
     interface Locals {
       user: Omit<UserTable, 'password'>;
+      stripeRawBody?: Buffer;
+      stripeEvent?: Stripe.Event;
     }
   }
 }
