@@ -1,13 +1,14 @@
 import type { PostCreateInput, PostUpdateInput, QueryParamSchema } from '@reddit-clone/shared';
 import { dbInstance } from '../../db/connection.js';
 import { postsTable } from '../../db/schemas/modules/post.table.js';
-import { and, eq, QueryPromise } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { userColumns } from '../user/services.js';
 import { postUserVotesTable } from '../../db/schemas/index.js';
 import { CustomError } from '../../http/error/customError.js';
-import { getSimilarEmbeddings, splitTextIntoChunks, storeEmbedding } from '../qdrant/services.js';
+import { getSimilarEmbeddings, storeEmbedding } from '../qdrant/services.js';
 import fs from 'fs/promises';
+import { getPresignedUrlFromKey } from '../s3/service.js';
 export function postColumns() {
   return {
     id: true,
@@ -15,6 +16,7 @@ export function postColumns() {
     title: true,
     created_at: true,
     slug: true,
+    imageKeys: true,
     updated_at: true,
     total_upvotes: true,
     total_downvotes: true,
@@ -80,8 +82,8 @@ export async function searchPosts(queryParams?: QueryParamSchema) {
   return getAllPosts(queryParams);
 }
 
-export function getPostById(postId: number) {
-  return dbInstance.query.postsTable.findFirst({
+export async function getPostById(postId: number) {
+  const post = await dbInstance.query.postsTable.findFirst({
     columns: postColumns(),
 
     where: {
@@ -94,10 +96,23 @@ export function getPostById(postId: number) {
       votes: true,
     },
   });
+
+  if (!post) return null;
+
+  const imageKeysToUrlMap: Record<string, string> = {};
+  for (const imageKey of post.imageKeys) {
+    const x = await getPresignedUrlFromKey(imageKey);
+    imageKeysToUrlMap[imageKey] = x;
+  }
+
+  return {
+    ...post,
+    imageUrls: imageKeysToUrlMap,
+  };
 }
 
-export function getPostBySlug(slug: string) {
-  return dbInstance.query.postsTable.findFirst({
+export async function getPostBySlug(slug: string) {
+  const post = await dbInstance.query.postsTable.findFirst({
     columns: postColumns(),
     where: {
       slug: slug,
@@ -109,6 +124,18 @@ export function getPostBySlug(slug: string) {
       votes: true,
     },
   });
+
+  if (!post) return null;
+
+  const imageUrls: Record<string, string> = {};
+  for (const imageKey of post.imageKeys) {
+    imageUrls[imageKey] = await getPresignedUrlFromKey(imageKey);
+  }
+
+  return {
+    ...post,
+    imageUrls,
+  };
 }
 
 export async function createPost(args: { post: PostCreateInput; userId: number }) {

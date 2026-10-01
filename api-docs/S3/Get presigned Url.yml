@@ -1,0 +1,22 @@
+info:
+  name: Get presigned Url
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/api/v1/s3/presigned-url"
+  body:
+    type: json
+    data: |-
+      {
+        "key": "uploads/2/image.jpeg__b7455799-0014-4c3a-908e-8e68ad346b02.jpeg"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -20,4 +20,5 @@ export type Post = {
   total_upvotes: number;
   total_downvotes: number;
   votes: Vote[];
+  imageUrls: Record<string, string>;
 };

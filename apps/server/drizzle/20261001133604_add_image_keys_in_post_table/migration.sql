@@ -1,0 +1,1 @@
+ALTER TABLE "post" ADD COLUMN "imageKeys" text[] DEFAULT '{}'::text[] NOT NULL;

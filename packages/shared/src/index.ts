@@ -8,4 +8,5 @@ export * from './schemas/comment.schema.js';
 export * from './utils/date.utils.js';
 export * from './utils/string.utils.js';
 export * from './schemas/chat.schema.js';
+export * from './schemas/s3.schema.js';
 export * as ai from 'ai';

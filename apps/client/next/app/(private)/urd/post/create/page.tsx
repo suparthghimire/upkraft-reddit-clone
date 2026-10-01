@@ -1,7 +1,7 @@
 'use client';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PostCreateInput, postCreateSchema } from '@reddit-clone/shared';
+import { acceptedFileMimeTypes, PostCreateInput, postCreateSchema } from '@reddit-clone/shared';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,14 +9,112 @@ import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
 import { createNewPost } from '@/lib/api/post.api';
 import { toast } from '@/components/ui/toast';
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentTitle,
+} from '@/components/ui/attachment';
+import { FileCodeIcon, FileTextIcon, X, XIcon } from 'lucide-react';
+
+import { useDropzone } from 'react-dropzone';
+import { useState } from 'react';
+import { Spinner } from '@phosphor-icons/react';
+import { handleCreateUploadUrl } from '@/lib/api/s3.api';
+import axios from 'axios';
+
 function CreateNewPost() {
   const { mutateAsync: triggerCreate, isPending } = useMutation({
     mutationFn: createNewPost,
     mutationKey: ['createNewPost'],
   });
 
+  const [files, setFiles] = useState<File[]>([]);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: [
+      {
+        accept: {
+          'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+        },
+      },
+    ],
+    onDrop: (acceptedFiles) => {
+      // Do something with the files, e.g. upload to a server
+      setFiles((prevFiles) =>
+        prevFiles.length <= 5 ? [...prevFiles, ...acceptedFiles] : prevFiles,
+      );
+    },
+  });
+
+  function handleFileRemove(fileIdx: number) {
+    setFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== fileIdx));
+  }
+
+  const { mutateAsync: triggerCreateUploadUrl, isPending: isCreatingUploadUrl } = useMutation({
+    mutationFn: handleCreateUploadUrl,
+    mutationKey: ['createUploadUrl'],
+  });
+
+  async function createWithFileUpload(data: PostCreateInput) {
+    if (files.length === 0) {
+      return toast.promise(triggerCreate(data), {
+        loading: 'Creating post...',
+        success: 'Post created successfully!',
+        error: 'Failed to create post.',
+      });
+    }
+
+    // Else, first generate upload urls and upload the files one by one
+    const response = await Promise.allSettled(
+      files.map((file) => {
+        return triggerCreateUploadUrl({
+          fileName: file.name,
+          contentType: file.type,
+        });
+      }),
+    );
+
+    const successResponses = response
+      .filter((res) => res.status === 'fulfilled')
+      .map((item) => {
+        return item.value;
+      });
+
+    const imageKeys = successResponses.map((res) => res.data?.key).filter(Boolean) as string[];
+
+    const uploadUrls = successResponses
+      .map((res) => res.data?.uploadUrl)
+      .filter(Boolean) as string[];
+
+    // For each upload url. upload the file
+    for (let i = 0; i < uploadUrls.length; i++) {
+      await axios.put(uploadUrls[i], files[i], {
+        headers: {
+          'Content-Type': files[i].type,
+        },
+      });
+    }
+
+    return toast.promise(
+      triggerCreate({
+        ...data,
+        imageKeys: imageKeys,
+      }),
+      {
+        loading: 'Creating post...',
+        success: 'Post created successfully!',
+        error: 'Failed to create post.',
+      },
+    );
+  }
+
   function handleCreatePost(data: PostCreateInput) {
-    toast.promise(triggerCreate(data), {
+    return toast.promise(createWithFileUpload(data), {
       loading: 'Creating post...',
       success: 'Post created successfully!',
       error: 'Failed to create post.',
@@ -93,6 +191,19 @@ function CreateNewPost() {
                   </Field>
                 )}
               />
+              <div
+                {...getRootProps()}
+                className="h-15.25 px-1 bg-card border border-border border-dashed rounded-xl flex items-center justify-center"
+              >
+                <input {...getInputProps()} />
+                {files.length <= 0 ? (
+                  <p>Drag drop some files here, or click to select files</p>
+                ) : null}
+
+                {files.length > 0 ? (
+                  <Attachments onFileRemove={handleFileRemove} files={files} />
+                ) : null}
+              </div>
             </FieldGroup>
 
             <div className="mt-6 flex justify-end border-t pt-5">
@@ -104,6 +215,38 @@ function CreateNewPost() {
         </FormProvider>
       </div>
     </main>
+  );
+}
+
+export function Attachments(props: { files: File[]; onFileRemove: (fileIdx: number) => void }) {
+  const { files } = props;
+
+  return (
+    <AttachmentGroup className="w-full">
+      {files.map((file, idx) => {
+        const src = URL.createObjectURL(file);
+        return (
+          <Attachment key={file.name} className="group relative">
+            <AttachmentMedia variant="image">
+              <img src={src} />
+            </AttachmentMedia>
+            <AttachmentContent>
+              <AttachmentTitle>{file.name}</AttachmentTitle>
+              <AttachmentDescription>{(file.size / 1024).toFixed(2)} KB</AttachmentDescription>
+              <button
+                className="hidden group-hover:grid size-5 rounded-full bg-card shadow-sm border border-input place-items-center cursor-pointer absolute -top-2 -right-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.onFileRemove(idx);
+                }}
+              >
+                <X className="size-3" />
+              </button>
+            </AttachmentContent>
+          </Attachment>
+        );
+      })}
+    </AttachmentGroup>
   );
 }
 

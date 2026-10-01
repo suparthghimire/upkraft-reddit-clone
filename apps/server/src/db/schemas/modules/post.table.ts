@@ -15,6 +15,8 @@ export const postsTable = pgTable(
     // Create a slug
     slug: text().unique().notNull(),
 
+    imageKeys: text().array().default([]).notNull(),
+
     total_upvotes: integer().notNull().default(0),
     total_downvotes: integer().notNull().default(0),
 

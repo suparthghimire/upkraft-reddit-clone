@@ -15,6 +15,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { APP_ROUTES } from '@/lib/app-routes';
 import { useMutation } from '@tanstack/react-query';
@@ -52,6 +53,7 @@ function PostView({ post }: { post: Post }) {
   const { data: currentUser } = useGetUserAPI();
 
   const wasEdited = toDate(post.updated_at).getTime() !== toDate(post.created_at).getTime();
+  const imageUrls = Object.values(post.imageUrls ?? {}).filter(Boolean);
 
   async function sharePost() {
     const shareData = { title: post.title, url: window.location.href };
@@ -124,6 +126,26 @@ function PostView({ post }: { post: Post }) {
               <div className="max-w-3xl whitespace-pre-wrap wrap-break-word text-[15px] leading-8 text-black/70 sm:text-base">
                 {post.content}
               </div>
+
+              {imageUrls.length > 0 ? (
+                <div className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="Post images">
+                  {imageUrls.map((imageUrl, index) => (
+                    <div
+                      key={imageUrl}
+                      className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#f5f3ef]"
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={`Image ${index + 1} attached to ${post.title}`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 700px"
+                        unoptimized
+                        className="object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-black/7 bg-[#fbfaf7] px-5 py-4 sm:px-9 lg:px-12">
