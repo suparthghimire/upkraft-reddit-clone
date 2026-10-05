@@ -10,12 +10,30 @@ import { sendResponse } from './response/index.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { env } from '../lib/env.schema.js';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { dbInstance } from '../db/connection.js';
+import path from 'node:path';
 export class CustomServer {
   public app: Express;
 
   constructor() {
     this.app = express();
     return this;
+  }
+
+  async performMigration() {
+    const migrationFolderDirectory = path.join(process.cwd(), 'drizzle');
+    try {
+      console.log('Starting migration...');
+      await migrate(dbInstance, {
+        migrationsFolder: migrationFolderDirectory,
+      });
+      console.log('Migration completed successfully.');
+      return this;
+    } catch (error) {
+      console.error('Migration failed:', error);
+      throw error;
+    }
   }
 
   startServer() {

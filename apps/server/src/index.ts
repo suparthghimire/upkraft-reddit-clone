@@ -11,13 +11,20 @@ const server = new CustomServer();
 console.log(env.DATABASE_URL);
 
 server
-  .startServer()
-  .regsiterRequiredMiddlewares()
-  .registerHealthCheckRoute()
-  .registerModuleRouter('v1', 'post', postRouter)
-  .registerModuleRouter('v1', 'auth', authRouter)
-  .registerModuleRouter('v1', 'user', userRouter)
-  .registerModuleRouter('v1', 'comment', commentRouter)
-  .registerModuleRouter('v1', 'chat', chatRouter)
-  .registerModuleRouter('v1', 's3', s3Router)
-  .registerRequestErrorHandler();
+  .performMigration()
+  .then((app) => {
+    app
+      .startServer()
+      .regsiterRequiredMiddlewares()
+      .registerHealthCheckRoute()
+      .registerModuleRouter('v1', 'post', postRouter)
+      .registerModuleRouter('v1', 'auth', authRouter)
+      .registerModuleRouter('v1', 'user', userRouter)
+      .registerModuleRouter('v1', 'comment', commentRouter)
+      .registerModuleRouter('v1', 'chat', chatRouter)
+      .registerModuleRouter('v1', 's3', s3Router)
+      .registerRequestErrorHandler();
+  })
+  .catch((err) => {
+    console.error('Server failed to start:', err);
+  });

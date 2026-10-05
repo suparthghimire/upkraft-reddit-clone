@@ -5,8 +5,6 @@ import { env } from '../../lib/env.schema.js';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { s3Client } from './client.js';
 
-//uploads/2/image.jpeg__b7455799-0014-4c3a-908e-8e68ad346b02.jpeg
-
 export async function getUploadUrl(args: {
   fileName: string;
   contentType: AcceptedFileMimeTypes;
