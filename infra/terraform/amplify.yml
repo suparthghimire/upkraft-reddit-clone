@@ -1,0 +1,22 @@
+version: 1
+applications:
+  - appRoot: apps/client/next
+    frontend:
+      buildPath: /
+      phases:
+        preBuild:
+          commands:
+            - nvm install 22 && nvm use 22
+            - npm install -g pnpm@11.21.0
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            - printf 'NEXT_PUBLIC_BASE_SERVER_API_ENDPOINT=%s\n' "$NEXT_PUBLIC_BASE_SERVER_API_ENDPOINT" > apps/client/next/.env.production
+            - pnpm --filter web-app build
+      artifacts:
+        baseDirectory: apps/client/next/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*

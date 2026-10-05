@@ -1,0 +1,16 @@
+.git
+.github
+**/node_modules
+**/dist
+**/.next
+**/.env
+**/.env.*
+!**/.env.example
+**/.terraform
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfplan
+**/*.tfvars
+**/backend.hcl
+.turbo
+.DS_Store

@@ -1,0 +1,12 @@
+aws_region       = "us-east-1"
+project_name     = "reddit-clone"
+github_repository = "https://github.com/YOUR_ORG/reddit-clone"
+github_branch     = "main"
+codestar_connection_arn = "arn:aws:codeconnections:us-east-1:123456789012:connection/REPLACE_ME"
+root_domain      = "example.com"
+api_domain       = "api.example.com"
+cloudflare_zone_id = "REPLACE_WITH_CLOUDFLARE_ZONE_ID"
+qdrant_endpoint  = "https://YOUR_CLUSTER.cloud.qdrant.io"
+
+# Supply secrets with TF_VAR_* environment variables or a gitignored .tfvars file.
+# Keep Terraform state in an encrypted, access-controlled remote backend.

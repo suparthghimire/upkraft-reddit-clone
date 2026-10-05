@@ -1,0 +1,31 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - set -euo pipefail
+      - export IMAGE_TAG="${CODEBUILD_RESOLVED_SOURCE_VERSION:-$CODEBUILD_BUILD_NUMBER}"
+      - export IMAGE_URI="$ECR_REPOSITORY_URI:$IMAGE_TAG"
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$(echo "$ECR_REPOSITORY_URI" | cut -d/ -f1)"
+  build:
+    commands:
+      - docker build -f apps/server/Dockerfile -t "$IMAGE_URI" .
+      - docker push "$IMAGE_URI"
+      - |
+        task_definition=$(aws ecs describe-task-definition --task-definition "$ECS_TASK_DEFINITION_ARN" --query taskDefinition --output json | jq --arg image "$IMAGE_URI" 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy) | .containerDefinitions |= map(if .name == "backend" then .image = $image else . end)')
+        migration_task_definition=$(aws ecs register-task-definition --cli-input-json "$task_definition" --query taskDefinition.taskDefinitionArn --output text)
+        migration_task=$(aws ecs run-task --cluster "$ECS_CLUSTER" --task-definition "$migration_task_definition" --launch-type EC2 --overrides '{"containerOverrides":[{"name":"backend","command":["pnpm","--filter","server","migration:apply"]}]}' --query tasks[0].taskArn --output text)
+        if [ -z "$migration_task" ] || [ "$migration_task" = "None" ]; then
+          echo "Could not start the database migration task"
+          exit 1
+        fi
+        aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$migration_task"
+        migration_exit_code=$(aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$migration_task" --query 'tasks[0].containers[?name==`backend`].exitCode | [0]' --output text)
+        if [ "$migration_exit_code" != "0" ]; then
+          echo "Database migration failed with exit code $migration_exit_code"
+          aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$migration_task" --query 'tasks[0].containers[?name==`backend`].reason | [0]' --output text
+          exit 1
+        fi
+      - printf '[{"name":"backend","imageUri":"%s"}]' "$IMAGE_URI" > imagedefinitions.json
+artifacts:
+  files:
+    - imagedefinitions.json

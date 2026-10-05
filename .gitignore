@@ -145,6 +145,14 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# Terraform state, provider caches, plans, and local credentials
+**/.terraform/*
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfplan
+infra/terraform/terraform.tfvars
+infra/terraform/backend.hcl
+
 
 # Dependencies
 node_modules
