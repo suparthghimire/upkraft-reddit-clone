@@ -9,23 +9,11 @@ import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
 import { createNewPost } from '@/lib/api/post.api';
 import { toast } from '@/components/ui/toast';
-import {
-  Attachment,
-  AttachmentAction,
-  AttachmentActions,
-  AttachmentContent,
-  AttachmentDescription,
-  AttachmentGroup,
-  AttachmentMedia,
-  AttachmentTitle,
-} from '@/components/ui/attachment';
-import { FileCodeIcon, FileTextIcon, X, XIcon } from 'lucide-react';
-
 import { useDropzone } from 'react-dropzone';
 import { useState } from 'react';
-import { Spinner } from '@phosphor-icons/react';
 import { handleCreateUploadUrl } from '@/lib/api/s3.api';
 import axios from 'axios';
+import { Attachments } from './attachments';
 
 function CreateNewPost() {
   const { mutateAsync: triggerCreate, isPending } = useMutation({
@@ -215,38 +203,6 @@ function CreateNewPost() {
         </FormProvider>
       </div>
     </main>
-  );
-}
-
-export function Attachments(props: { files: File[]; onFileRemove: (fileIdx: number) => void }) {
-  const { files } = props;
-
-  return (
-    <AttachmentGroup className="w-full">
-      {files.map((file, idx) => {
-        const src = URL.createObjectURL(file);
-        return (
-          <Attachment key={file.name} className="group relative">
-            <AttachmentMedia variant="image">
-              <img src={src} />
-            </AttachmentMedia>
-            <AttachmentContent>
-              <AttachmentTitle>{file.name}</AttachmentTitle>
-              <AttachmentDescription>{(file.size / 1024).toFixed(2)} KB</AttachmentDescription>
-              <button
-                className="hidden group-hover:grid size-5 rounded-full bg-card shadow-sm border border-input place-items-center cursor-pointer absolute -top-2 -right-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  props.onFileRemove(idx);
-                }}
-              >
-                <X className="size-3" />
-              </button>
-            </AttachmentContent>
-          </Attachment>
-        );
-      })}
-    </AttachmentGroup>
   );
 }
 
