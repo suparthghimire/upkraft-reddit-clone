@@ -34,11 +34,6 @@ const envSchema = z.object({
 
   AWS_REGION: z.string().min(1, 'AWS_REGION is required and must be a valid string'),
   AWS_BUCKET_NAME: z.string().min(1, 'AWS_BUCKET_NAME is required and must be a valid string'),
-  AWS_ACCESS_KEY_ID: z.string().min(1, 'AWS_ACCESS_KEY_ID is required and must be a valid string'),
-  AWS_SECRET_ACCESS_KEY: z
-    .string()
-    .min(1, 'AWS_SECRET_ACCESS_KEY is required and must be a valid string'),
-  AWS_SESSION_TOKEN: z.string().min(1, 'AWS_SESSION_TOKEN is required and must be a valid string'),
 });
 
 export const env = envSchema.parse(process.env);
