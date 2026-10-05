@@ -46,7 +46,8 @@ export async function proxy(request: NextRequest) {
     if (isProtectedOnlyRoute) return NextResponse.next();
 
     throw new Error('Cannot access');
-  } catch {
+  } catch (err) {
+    console.log('FAILED VERIFY LOGIN', err);
     if (isPublicOnlyRoute) return NextResponse.next();
 
     return NextResponse.redirect(new URL(APP_ROUTES.AUTH.LOGIN, request.url));
