@@ -41,7 +41,7 @@ export async function login(res: Response, body: LoginInput) {
     maxAge: AUTH_ACCESS_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000, // Expiration time in milliseconds (e.g., 900,000 ms = 15 minutes)
     httpOnly: true, // Prevents client-side scripts from reading the cookie (protects against XSS)
     secure: env.NODE_ENV !== E_NODE_ENV_ENUM.local, // Ensures the cookie is only sent over encrypted HTTPS connections
-    sameSite: env.NODE_ENV === E_NODE_ENV_ENUM.local ? 'lax' : 'strict', // Controls cross-site behavior to mitigate CSRF attacks
+    sameSite: 'lax', // Controls cross-site behavior to mitigate CSRF attacks
   });
 }
 
