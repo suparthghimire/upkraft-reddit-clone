@@ -5,7 +5,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import TextInput from './_components/text-input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChat } from '@ai-sdk/react';
-import { env } from '@/env.mjs';
 import { useState } from 'react';
 import { ChatEvent, ChatUIMessage } from './types';
 import MessagesList from './_components/messages-list';
@@ -15,7 +14,7 @@ function DashboardPage() {
   const [events, setEvents] = useState<ChatEvent[]>([]);
   const { sendMessage, messages, status } = useChat<ChatUIMessage>({
     transport: new ai.DefaultChatTransport({
-      api: `${env.NEXT_PUBLIC_BASE_SERVER_API_ENDPOINT}/v1/chat/stream`,
+      api: '/api/v1/chat/stream',
       credentials: 'include',
     }),
     onData(part) {
